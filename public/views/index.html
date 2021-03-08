@@ -15,46 +15,32 @@
                 <audio id=recordedAudio></audio>
             </p>
         </div>
-        <script type="text/javascript">
-            navigator.mediaDevices.getUserMedia({audio:true})
-                .then(stream => {handlerFunction(stream)})
 
-            function handlerFunction(stream) {
-            rec = new MediaRecorder(stream);
-            rec.ondataavailable = e => {
-              audioChunks.push(e.data);
-              if (rec.state == "inactive"){
-                let blob = new Blob(audioChunks,{type:'audio/mpeg-3'});
-                recordedAudio.src = URL.createObjectURL(blob);
-                recordedAudio.controls=true;
-                recordedAudio.autoplay=true;
-                sendData(blob)
-              }
-            }
-          }
+        <!-- recording audio files within the app -->
+        <script type="text/javascript" src="../js/record.js"></script>
+
         
-        function sendData(data) {}
 
-        // start recording
-        record.onclick = e => {
-          console.log('I was clicked')
-          record.disabled = true;
-          record.style.backgroundColor = "blue"
-          stopRecord.disabled=false;
-          audioChunks = [];
-          rec.start();
-        }
+      <!-- playing mp3 files directly from the google drive -->
+      <!-- https://portalzine.de/dev/html5/hosting-mp3-files-on-google-drive-html5-audio-player/ -->
+      <script type="text/javascript">
 
-        // stop recording
-        stopRecord.onclick = e => {
-          console.log("I was clicked")
-          record.disabled = false;
-          stop.disabled=true;
-          record.style.backgroundColor = "red"
-          rec.stop();
-        }
+        // var fileId = '1WVpKadJ2TuIDNiDb2L6TJOas1GJx_Fs2';
+        // var dest = fs.createWriteStream('/tmp/photo.jpg');
+        // drive.files.get({
+        //   fileId: fileId,
+        //   alt: 'media'
+        // })
+        //     .on('end', function () {
+        //       console.log('Done');
+        //     })
+        //     .on('error', function (err) {
+        //       console.log('Error during download', err);
+        //     })
+        //     .pipe(dest);
 
-        </script>
+      </script>
+
     </body>
 
 </html>
