@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
        <title>Audio Recording</title>
-       <!-- <style> put css here </style> -->
+        <link rel="stylesheet" href="main.css">
     </head>
     <body>
         <p>listen to ya coworkers</p>
@@ -16,45 +16,12 @@
             </p>
         </div>
         <script type="text/javascript">
-            navigator.mediaDevices.getUserMedia({audio:true})
-                .then(stream => {handlerFunction(stream)})
-
-            function handlerFunction(stream) {
-            rec = new MediaRecorder(stream);
-            rec.ondataavailable = e => {
-              audioChunks.push(e.data);
-              if (rec.state == "inactive"){
-                let blob = new Blob(audioChunks,{type:'audio/mpeg-3'});
-                recordedAudio.src = URL.createObjectURL(blob);
-                recordedAudio.controls=true;
-                recordedAudio.autoplay=true;
-                sendData(blob)
-              }
-            }
-          }
-        
-        function sendData(data) {}
-
-        // start recording
-        record.onclick = e => {
-          console.log('I was clicked')
-          record.disabled = true;
-          record.style.backgroundColor = "blue"
-          stopRecord.disabled=false;
-          audioChunks = [];
-          rec.start();
-        }
-
-        // stop recording
-        stopRecord.onclick = e => {
-          console.log("I was clicked")
-          record.disabled = false;
-          stop.disabled=true;
-          record.style.backgroundColor = "red"
-          rec.stop();
-        }
-
+            
         </script>
+        
+        <canvas id="myCanvas"></canvas>
+        <script src="graphics.js"></script>
+        <script src="audio.js"></script>
     </body>
 
 </html>
