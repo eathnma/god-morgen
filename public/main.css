@@ -1,0 +1,31 @@
+@font-face {
+  font-family: maax;
+  src: url(maax.ttf);
+}
+
+* { 
+    padding: 0; 
+    margin: 0; 
+    
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+canvas { 
+    position: absolute;
+    top: 0;
+    background: #eee; 
+    display: block; 
+    margin: 0 auto;
+    z-index: -99;
+}
+
+.holder {
+    display: flex;
+    justify-content: center;
+}
+#message {
+    margin-top: 50px;
+    text-align: center;
+    font-family: maax;
+}
