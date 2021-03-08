@@ -1,0 +1,22 @@
+{
+  "name": "god-morgen",
+  "version": "1.0.0",
+  "description": "God-Morgen Carman",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eathnma/god-morgen.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eathnma/god-morgen/issues"
+  },
+  "homepage": "https://github.com/eathnma/god-morgen#readme",
+  "dependencies": {
+    "googleapis": "^39.2.0"
+  }
+}
