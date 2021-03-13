@@ -7,7 +7,6 @@ const express = require('express');
 // socket.io code
 const http = require('http').createServer(app);
 
-
 app.use(express.static("public"));
 app.use('/js',express.static(__dirname + '/js'));
 
