@@ -29,23 +29,24 @@ function sendData(data) {
     console.log(data);
     // write this blob to the google drive folder.
     
+
 }
 
 // start recording
 record.onclick = e => {
-console.log('I was clicked')
-record.disabled = true;
-record.style.backgroundColor = "blue"
-stopRecord.disabled=false;
-audioChunks = [];
-rec.start();
+    console.log('I was clicked')
+    record.disabled = true;
+    record.style.backgroundColor = "blue"
+    stopRecord.disabled=false;
+    audioChunks = [];
+    rec.start();
 }
 
 // stop recording
 stopRecord.onclick = e => {
-console.log("I was clicked")
-record.disabled = false;
-stop.disabled=true;
-record.style.backgroundColor = "red"
-rec.stop();
+    console.log("I was clicked")
+    record.disabled = false;
+    stop.disabled=true;
+    record.style.backgroundColor = "red"
+    rec.stop();
 }
