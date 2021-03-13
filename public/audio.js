@@ -1,5 +1,5 @@
 navigator.mediaDevices.getUserMedia({audio:true})
-                .then(stream => {handlerFunction(stream)})
+            .then(stream => {handlerFunction(stream)})
 
             function handlerFunction(stream) {
             rec = new MediaRecorder(stream);

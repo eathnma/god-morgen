@@ -12,7 +12,7 @@ var friction = -0.4;
 const balls = [];
 const maxSize = 100;
 var index = 0;
-
+var size = 30;
     
 window.onload = function(){
     init();
@@ -34,6 +34,17 @@ var plum = 'rgb(143, 23, 97)';
 
 var colors = [blue, green, indigo, mustard, orange, plum];
 
+const cursor = document.querySelector(".cursor");
+
+function moveMouse(e) {
+    cursor.style.top = (e.pageY - size) + "px";
+    cursor.style.left = (e.pageX - size)+ "px";
+    cursor.style.width = size;
+    cursor.style.height = size;
+}
+
+window.addEventListener("mousemove", moveMouse);
+
 function init(){
     canvas = document.getElementById("myCanvas");
     context = canvas.getContext("2d");
@@ -53,18 +64,19 @@ function init(){
 if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
 
 var mousedownID = 0;
-
 var newBall;
 var mouseX;
 var mouseY;
 
+var hoverID = 0;
+
 function mousedown(event) {
-    let size = 10;
     newBall = new Ball(event.x, event.y, size, balls);
     balls.push(newBall);
+
     if (mousedownID == 0) {
         mousedownID = setInterval(createBall, 30);
-    } 
+    }
 }
 
 function position(event){
@@ -78,6 +90,7 @@ function mouseup(event) {
         mousedownID = 0;
         newBall.setDrag(false);
     }
+    
     counter = 0;
 }
 
@@ -95,10 +108,6 @@ document.addEventListener("mousedown", mousedown);
 document.addEventListener("mouseup", mouseup);
 document.addEventListener("mouseout", mouseup);
 document.addEventListener("mousemove", position);
-
-document.body.onmousedown = function(e){
-
-}
 
 class Ball {
     x;
@@ -123,25 +132,26 @@ class Ball {
     }
         
     collide(){
-        if (this.drag == false) {
-            for (let i = this.id + 1; i < numBalls; i++){
+//        if (this.drag == false) {
+            for (let i = 0; i < balls.length; i++){
                 let dx = this.others[i].x - this.x;
                 let dy = this.others[i].y - this.y;
                 let distance = Math.sqrt(dx*dx + dy*dy);
-                let minDist = this.others[i].diameter/2 + this.diameter/2;
-
+                let minDist = this.others[i].diameter + this.diameter;
+                console.log("UGHHHH");
                 if (distance < minDist) {
                     let angle = Math.atan2(dy,dx);
                     let targetX = this.x + Math.cos(angle) * minDist;
                     let targetY = this.y + Math.sin(angle) * minDist;
-                    let ax = (targetX - this.others[i].x) * spring;
-                    let ay = (targetY - this.others[i].y) * spring;
+                    let ax = (targetX - this.others[i].x);
+                    let ay = (targetY - this.others[i].y);
                     this.vx -= ax;
                     this.vy -= ay;
                     this.others[i].vx += ax;
                     this.others[i].vy += ay;
+                    console.log("BUMP");
                 }
-            }
+//            }
         }
     }
         
@@ -188,6 +198,14 @@ class Ball {
     setSize(num){
         if (this.diameter < maxSize) this.diameter += num;
     }
+    
+    getX() {
+        return this.x;
+    }
+
+    getY() {
+        return this.y;
+    }
 }
     
 function getRandomInt(min, max){
@@ -201,6 +219,10 @@ function draw() {
         ball.collide();
         ball.move();
         ball.display();
+        
+        if (mouseX > ball.getX - 30 && mouseX < ball.getX + 30 && mouseY > ball.getY - 30 && mouseY < ball.getY + 30) {
+            console.log("HIT");
+        }
     }
 }
     

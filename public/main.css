@@ -9,6 +9,8 @@
     
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    
+    cursor: none;
 }
 
 canvas { 
@@ -23,7 +25,20 @@ canvas {
 .holder {
     display: flex;
     justify-content: center;
+    z-index: 100;
 }
+
+.cursor {
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    border: 1px dashed grey;
+
+}
+
 #message {
     margin-top: 50px;
     text-align: center;
