@@ -1,24 +1,44 @@
-const path = require('path');
+import {Googl} from "./google-drive.js";
+var googl = new Googl();
+
+// run Backend Node Server
+import path, {dirname} from "path";
 const port = 1500;
 
-const app = require('express')();
-const express = require('express');
+import express from "express";
+const app = express();
+
+import ejs from "ejs";
+import {fileURLToPath} from "url";
+import bodyParser from "body-parser";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // socket.io code
-const http = require('http').createServer(app);
+import http from "http";
+const server = http.createServer(app);
+
+// const __dirname = path.resolve(path.dirname(""));
+
+app.use(bodyParser.urlencoded());
 
 app.use(express.static("public"));
-app.use('/js',express.static(__dirname + '/js'));
+app.use("/js", express.static(__dirname + "/js"));
 
-app.set('views', path.join(__dirname, '/views'));
-app.engine('html', require('ejs').renderFile);
+app.set("views", path.join(__dirname, "/views"));
+app.engine("html", ejs.renderFile);
 
-app.get('/', (req, res) => {
-  res.sendFile('/views/index.html',{ root: __dirname });
-})
+app.get("/", (req, res) => {
+  res.sendFile("/views/index.html", {root: __dirname});
+});
+
+// grab blob
+app.post("/sendBlob", (req, res) => {
+  console.log(req.body);
+  googl.handleFile("screaming", req.body);
+});
 
 //heroku deployment
-http.listen(process.env.PORT || port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
-  });
-  
+server.listen(process.env.PORT || port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
