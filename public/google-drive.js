@@ -48,6 +48,7 @@ function getAccessToken(oAuth2Client, callback) {
   });
 }
 
+//to call from the server
 export class Googl {
   constructor() {
     // Load client secrets from a local file.
@@ -125,8 +126,7 @@ export class Googl {
     var media = {
       // if not, use "audio/mpeg3"
       mimeType: "audio/mpeg-3",
-      //   body: fs.createReadStream(blob),
-      body: blob,
+      body: fs.createReadStream(blob),
     };
 
     drive.files.create(

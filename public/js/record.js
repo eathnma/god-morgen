@@ -11,6 +11,8 @@ function handlerFunction(stream) {
   let blob;
   let urlMP3;
 
+  var reader = new FileReader();
+
   rec.ondataavailable = (e) => {
     audioChunks.push(e.data);
     if (rec.state == "inactive") {
@@ -19,12 +21,15 @@ function handlerFunction(stream) {
       recordedAudio.src = URL.createObjectURL(blob);
       recordedAudio.controls = true;
       recordedAudio.autoplay = true;
-      sendData(blob);
+      reader.readAsDataURL(blob);
+      // reader.onloadend = function () {
+      //   var base64data = reader.result;
+      //   // sendData :)
+      //   sendData(base64data);
+      // };
+      sendData(urlMP3);
     }
   };
-
-  // console.log(blob);
-  // console.log(urlMP3);
 }
 
 function sendData(data) {
@@ -32,9 +37,7 @@ function sendData(data) {
   // send blob to the backend
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/sendBlob", true);
-  // xhr.setRequestHeader('Content-Type', 'application/vnd.google-apps.audio');
-  //xhr.setRequestHeader("Content-Type", "audio/mpeg-3");
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.setRequestHeader("Content-Type", "audio/mpeg-3");
   xhr.send(data);
 }
 
