@@ -1,6 +1,6 @@
 @font-face {
   font-family: maax;
-  src: url(maax.ttf);
+  src: url(assets/maax.ttf);
 }
 
 * { 
@@ -16,7 +16,7 @@
 canvas { 
     position: absolute;
     top: 0;
-    background: #eee; 
+    background: #f8f7f6; 
     display: block; 
     margin: 0 auto;
     z-index: -99;
@@ -36,7 +36,11 @@ canvas {
     left: 0;
     border-radius: 50%;
     border: 1px dashed grey;
+}
 
+#cursor-icon {
+    transform: translate(20px, 20px);
+    fill: grey;
 }
 
 #message {

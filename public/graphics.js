@@ -4,16 +4,16 @@ var context;
 var canvas;
 var myWidth;
 var myHeight;
-       
+
 var numBalls = 12;
 var spring = 0.05;
-var gravity = 0.098;
+var gravity = 0.98;
 var friction = -0.4;
 const balls = [];
 const maxSize = 100;
 var index = 0;
-var size = 30;
-    
+var cursorSize = 30;
+
 window.onload = function(){
     init();
     window.addEventListener('resize', init, false);
@@ -36,14 +36,56 @@ var colors = [blue, green, indigo, mustard, orange, plum];
 
 const cursor = document.querySelector(".cursor");
 
-function moveMouse(e) {
-    cursor.style.top = (e.pageY - size) + "px";
-    cursor.style.left = (e.pageX - size)+ "px";
-    cursor.style.width = size;
-    cursor.style.height = size;
+
+//const inactive = 0;
+//const recording = 1;
+//const listening = 2;
+//var state = inactive;
+//
+//switch(state) {
+//    case recording:
+//        document.getElementByID("message").innerHTML = "Recording...";
+//        break;
+//    case listening:
+//        document.getElementByID("message").innerHTML = "Listening to";
+//        break;
+//    case inactive:
+//        if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
+//}
+//
+//console.log("state:" + state);
+
+//if (state == recording) {
+//    document.getElementByID("message").innerHTML = "Recording..."; 
+//} else if (state == listening) {
+//    document.getElementByID("message").innerHTML = "Listening to";
+//} else if (state == inactive) {
+//    if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
+//}
+
+function mouseMove(event) {
+    mouseX = event.x;
+    mouseY = event.y;
+    
+//    for (let i = 0; i < balls.length; i++){
+////        let currBall = balls[i];
+//        if (balls[i].checkHover() == true){
+//            console.log("HIT");
+//            document.querySelector("canvas").style.background = "blue";
+//        } else if (balls[i].checkHover() == false) {
+//            document.querySelector("canvas").style.background = "white";
+//        }
+//    }
+//    }
+    
+    cursor.style.top = (event.pageY - cursorSize) + "px";
+    cursor.style.left = (event.pageX - cursorSize)+ "px";
+    cursor.style.width = cursorSize;
+    cursor.style.height = cursorSize;
+
 }
 
-window.addEventListener("mousemove", moveMouse);
+//window.addEventListener("mousemove", moveMouse);
 
 function init(){
     canvas = document.getElementById("myCanvas");
@@ -57,11 +99,14 @@ function init(){
         let ball = new Ball(getRandomInt(0, myWidth), getRandomInt(0, myHeight), getRandomInt(30, 70), balls);
         balls.push(ball);
     }
-        
+    
     console.log(balls.length);
+    
+    window.requestAnimationFrame(gameLoop);
 }
 
-if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
+//if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
+
 
 var mousedownID = 0;
 var newBall;
@@ -71,7 +116,8 @@ var mouseY;
 var hoverID = 0;
 
 function mousedown(event) {
-    newBall = new Ball(event.x, event.y, size, balls);
+//        state = recording;
+    newBall = new Ball(event.x, event.y, cursorSize, balls);
     balls.push(newBall);
 
     if (mousedownID == 0) {
@@ -79,14 +125,10 @@ function mousedown(event) {
     }
 }
 
-function position(event){
-    mouseX = event.x;
-    mouseY = event.y;
-}
-
 function mouseup(event) {
     if (mousedownID != 0) {
         clearInterval(mousedownID);
+//        state = inactive;
         mousedownID = 0;
         newBall.setDrag(false);
     }
@@ -98,7 +140,7 @@ var counter = 0;
 
 function createBall(){
     newBall.setSize(1);
-    newBall.setPos(mouseX, mouseY);
+    newBall.setPos(mouseX, mouseY); 
     newBall.setDrag(true);
     counter++;
     console.log("counter: " + counter);
@@ -107,7 +149,7 @@ function createBall(){
 document.addEventListener("mousedown", mousedown);
 document.addEventListener("mouseup", mouseup);
 document.addEventListener("mouseout", mouseup);
-document.addEventListener("mousemove", position);
+document.addEventListener("mousemove", mouseMove);
 
 class Ball {
     x;
@@ -132,7 +174,7 @@ class Ball {
     }
         
     collide(){
-//        if (this.drag == false) {
+        if (this.drag == false) {
             for (let i = 0; i < balls.length; i++){
                 let dx = this.others[i].x - this.x;
                 let dy = this.others[i].y - this.y;
@@ -151,7 +193,7 @@ class Ball {
                     this.others[i].vy += ay;
                     console.log("BUMP");
                 }
-//            }
+            }
         }
     }
         
@@ -185,7 +227,18 @@ class Ball {
         context.fill();
         context.closePath();
     }
-        
+    
+//    checkHover(){
+//        if (mouseX > this.x - this.diameter && mouseX < this.x + this.diameter && mouseY > this.y - this.diameter && mouseY < this.y + this.diameter) {
+//            document.querySelector("canvas").style.background = "blue";
+////            return true;
+//        } else {
+//             document.querySelector("canvas").style.background = "white";
+////            return false;
+//        }
+//    }
+//        
+    
     setDrag(bool){
         this.drag = bool;
     }
@@ -211,7 +264,7 @@ class Ball {
 function getRandomInt(min, max){
     return Math.floor(Math.random() * (max - min)) + min;
 }
-    
+
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < balls.length; i++){
@@ -220,15 +273,46 @@ function draw() {
         ball.move();
         ball.display();
         
-        if (mouseX > ball.getX - 30 && mouseX < ball.getX + 30 && mouseY > ball.getY - 30 && mouseY < ball.getY + 30) {
-            console.log("HIT");
+        if (mouseX > ball.x - ball.diameter && mouseX < ball.x + ball.diameter && mouseY > ball.y - ball.diameter && mouseY < ball.y + ball.diameter) {
+            document.querySelector("canvas").style.background = "blue"; 
+        } else {
+             document.querySelector("canvas").style.background = "white";
+        }
+//        ball.checkHover();
+        
+        if (person != null) document.getElementById("message").innerHTML = balls.length;
         }
     }
-}
-    
+
+//function hover(ball){
+//            if (mouseX > ball.x - ball.diameter && mouseX < ball.x + ball.diameter && mouseY > ball.y - ball.diameter && mouseY < ball.y + ball.diameter) {
+//            document.querySelector("canvas").style.background = "blue";
+////            return true;
+//        } else {
+//             document.querySelector("canvas").style.background = "white";
+////            return false;
+//        }
+////                    ball.checkHover();
+//        
+//}
+//    
 function addBall(xin, yin){
     let ball = new Ball(xin, yin, getRandomInt(30, 70), index, balls);
     balls.push(ball);
 }
 
-setInterval(draw, 10);
+let secondsPassed;
+let oldTimeStamp;
+let fps;
+
+function gameLoop(timeStamp){
+    secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+    oldTimeStamp = timeStamp;
+    
+    fps = Math.round(1 / secondsPassed);
+    
+    draw();
+//    balls.forEach(hover);
+        
+    window.requestAnimationFrame(gameLoop);
+}
