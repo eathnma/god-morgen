@@ -17,27 +17,34 @@ function handlerFunction(stream) {
     audioChunks.push(e.data);
     if (rec.state == "inactive") {
       blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
-      urlMP3 = URL.createObjectURL(blob);
+      var buffer = new Buffer(blob, "binary");
+
+      // CREATE URL for the mp3 blob
+      // urlMP3 = URL.createObjectURL(blob);
       recordedAudio.src = URL.createObjectURL(blob);
       recordedAudio.controls = true;
       recordedAudio.autoplay = true;
-      reader.readAsDataURL(blob);
+
+      // Send Data
+      sendData(buffer);
+      console.log("Sent: " + urlMP3);
+
+      // reader.readAsDataURL(blob);
       // reader.onloadend = function () {
       //   var base64data = reader.result;
       //   // sendData :)
       //   sendData(base64data);
       // };
-      sendData(urlMP3);
+      // sendData(urlMP3);
     }
   };
 }
 
 function sendData(data) {
-  console.log(data);
   // send blob to the backend
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "/sendBlob", true);
-  xhr.setRequestHeader("Content-Type", "audio/mpeg-3");
+  xhr.setRequestHeader("Content-Type", "application/octet-stream");
   xhr.send(data);
 }
 
@@ -59,3 +66,4 @@ stopRecord.onclick = (e) => {
   record.style.backgroundColor = "red";
   rec.stop();
 };
+//

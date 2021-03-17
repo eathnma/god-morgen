@@ -34,8 +34,8 @@ app.get("/", (req, res) => {
 
 // grab blob
 app.post("/sendBlob", (req, res) => {
-  console.log(req.body);
-  googl.handleFile("screaming", req.body);
+  console.log(req);
+  googl.handleFile("screaming", req);
 });
 
 //heroku deployment

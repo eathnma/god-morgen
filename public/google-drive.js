@@ -54,19 +54,19 @@ export class Googl {
     // Load client secrets from a local file.
   }
 
-  handleFile(name, blob) {
+  handleFile(name, body) {
     var that = this;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
       //authorize(JSON.parse(content), listFiles);
-      that.authorize(JSON.parse(content), that.uploadFile, name, blob);
+      that.authorize(JSON.parse(content), that.uploadFile, name, body);
       // authorize(JSON.parse(content), uploadFile);
     });
   }
 
   // authorize ;.;
-  authorize(credentials, callback, name, blob) {
+  authorize(credentials, callback, name, body) {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id,
@@ -78,7 +78,7 @@ export class Googl {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getAccessToken(oAuth2Client, callback);
       oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client, name, blob); //list files and upload file
+      callback(oAuth2Client, name, body); //list files and upload file
       //callback(oAuth2Client, '0B79LZPgLDaqESF9HV2V3YzYySkE');//get file
     });
   }
@@ -117,7 +117,7 @@ export class Googl {
   //     );
   //   }
 
-  uploadFile(auth, name, blob) {
+  uploadFile(auth, name, body) {
     const drive = google.drive({version: "v3", auth});
     var fileMetadata = {
       name: name,
@@ -126,7 +126,7 @@ export class Googl {
     var media = {
       // if not, use "audio/mpeg3"
       mimeType: "audio/mpeg-3",
-      body: fs.createReadStream(blob),
+      body: fs.WriteStream(body),
     };
 
     drive.files.create(
@@ -151,7 +151,6 @@ export class Googl {
     drive.files.get({fileId: fileId, fields: "*"}, (err, res) => {
       if (err) return console.log("The API returned an error: " + err);
       console.log(res.data);
-      c;
     });
   }
 }
