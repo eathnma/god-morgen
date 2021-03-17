@@ -1,3 +1,5 @@
+paper.install(window);
+
 var person = prompt("Please enter your name", "Harry Potter");
 
 var context;
@@ -16,26 +18,17 @@ var cursorSize = 30;
 
 window.onload = function(){
     init();
-    window.addEventListener('resize', init, false);
+//    window.addEventListener('resize', init, false);
+
 }
 
-
 function init(){
-    canvas = document.getElementById("myCanvas");
-    context = canvas.getContext("2d");
-    myWidth = window.innerWidth;
-    myHeight = window.innerHeight;
-    context.canvas.width = myWidth;
-    context.canvas.height = myHeight;
-        
     while(balls.length < numBalls) {
         let ball = new Ball(getRandomInt(0, myWidth), getRandomInt(0, myHeight), getRandomInt(30, 70), balls);
         balls.push(ball);
     }
     
     console.log(balls.length);
-    
-    window.requestAnimationFrame(gameLoop);
 }
 
 function Color(red,green,blue) {
@@ -55,60 +48,15 @@ var colors = [blue, green, indigo, mustard, orange, plum];
 
 const cursor = document.querySelector(".cursor");
 
-
-//const inactive = 0;
-//const recording = 1;
-//const listening = 2;
-//var state = inactive;
-//
-//switch(state) {
-//    case recording:
-//        document.getElementByID("message").innerHTML = "Recording...";
-//        break;
-//    case listening:
-//        document.getElementByID("message").innerHTML = "Listening to";
-//        break;
-//    case inactive:
-//        if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
-//}
-//
-//console.log("state:" + state);
-
-//if (state == recording) {
-//    document.getElementByID("message").innerHTML = "Recording..."; 
-//} else if (state == listening) {
-//    document.getElementByID("message").innerHTML = "Listening to";
-//} else if (state == inactive) {
-//    if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
-//}
-
 function mouseMove(event) {
     mouseX = event.x;
     mouseY = event.y;
-    
-//    for (let i = 0; i < balls.length; i++){
-////        let currBall = balls[i];
-//        if (balls[i].checkHover() == true){
-//            console.log("HIT");
-//            document.querySelector("canvas").style.background = "blue";
-//        } else if (balls[i].checkHover() == false) {
-//            document.querySelector("canvas").style.background = "white";
-//        }
-//    }
-//    }
     
     cursor.style.top = (event.pageY - cursorSize) + "px";
     cursor.style.left = (event.pageX - cursorSize)+ "px";
     cursor.style.width = cursorSize;
     cursor.style.height = cursorSize;
-
 }
-
-//window.addEventListener("mousemove", moveMouse);
-
-
-//if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
-
 
 var mousedownID = 0;
 var newBall;
@@ -117,8 +65,7 @@ var mouseY;
 
 var hoverID = 0;
 
-function mousedown(event) {
-//        state = recording;
+function onMouseDown(event) {
     newBall = new Ball(event.x, event.y, cursorSize, balls);
     balls.push(newBall);
 
@@ -127,10 +74,8 @@ function mousedown(event) {
     }
 }
 
-function mouseup(event) {
+function onMouseUp(event) {
     if (mousedownID != 0) {
-        clearInterval(mousedownID);
-//        state = inactive;
         mousedownID = 0;
         newBall.setDrag(false);
     }
@@ -148,10 +93,10 @@ function createBall(){
     console.log("counter: " + counter);
 }
 
-document.addEventListener("mousedown", mousedown);
-document.addEventListener("mouseup", mouseup);
-document.addEventListener("mouseout", mouseup);
-document.addEventListener("mousemove", mouseMove);
+//document.addEventListener("mousedown", mousedown);
+//document.addEventListener("mouseup", mouseup);
+//document.addEventListener("mouseout", mouseup);
+//document.addEventListener("mousemove", mouseMove);
 
 class Ball {
     x;
@@ -173,6 +118,8 @@ class Ball {
         this.vy = 0;
         this.randomColor = colors[Math.floor(Math.random() * colors.length)];
         this.drag = false;
+        
+        paper.setup('myCanvas');
     }
         
     collide(){
@@ -223,23 +170,9 @@ class Ball {
     }
         
     display(){
-        context.beginPath();
-        context.arc(this.x, this.y, this.diameter, 0, Math.PI*2);
-        context.fillStyle = this.randomColor;
-        context.fill();
-        context.closePath();
-    }
-    
-//    checkHover(){
-//        if (mouseX > this.x - this.diameter && mouseX < this.x + this.diameter && mouseY > this.y - this.diameter && mouseY < this.y + this.diameter) {
-//            document.querySelector("canvas").style.background = "blue";
-////            return true;
-//        } else {
-//             document.querySelector("canvas").style.background = "white";
-////            return false;
-//        }
-//    }
-//        
+        let myCircle = new Path.Circle(new Point(this.x, this.y), this.diameter);
+        myCircle.fillColor = 'black';
+    }      
     
     setDrag(bool){
         this.drag = bool;
@@ -267,54 +200,29 @@ function getRandomInt(min, max){
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function draw() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+function onFrame(event) {
+    console.log("onFrame");
+
+            var testBall = new Path.Circle(new Point(100, 100), 100);
+    
     for (let i = 0; i < balls.length; i++){
         let ball = balls[i];
         ball.collide();
         ball.move();
         ball.display();
         
+
         if (mouseX > ball.x - ball.diameter && mouseX < ball.x + ball.diameter && mouseY > ball.y - ball.diameter && mouseY < ball.y + ball.diameter) {
             document.querySelector("canvas").style.background = "blue"; 
         } else {
              document.querySelector("canvas").style.background = "white";
         }
-//        ball.checkHover();
         
         if (person != null) document.getElementById("message").innerHTML = balls.length;
         }
     }
-
-//function hover(ball){
-//            if (mouseX > ball.x - ball.diameter && mouseX < ball.x + ball.diameter && mouseY > ball.y - ball.diameter && mouseY < ball.y + ball.diameter) {
-//            document.querySelector("canvas").style.background = "blue";
-////            return true;
-//        } else {
-//             document.querySelector("canvas").style.background = "white";
-////            return false;
-//        }
-////                    ball.checkHover();
-//        
-//}
-//    
+  
 function addBall(xin, yin){
     let ball = new Ball(xin, yin, getRandomInt(30, 70), index, balls);
     balls.push(ball);
-}
-
-let secondsPassed;
-let oldTimeStamp;
-let fps;
-
-function gameLoop(timeStamp){
-    secondsPassed = (timeStamp - oldTimeStamp) / 1000;
-    oldTimeStamp = timeStamp;
-    
-    fps = Math.round(1 / secondsPassed);
-    
-    draw();
-//    balls.forEach(hover);
-        
-    window.requestAnimationFrame(gameLoop);
 }
