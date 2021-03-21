@@ -17,16 +17,16 @@ function handlerFunction(stream) {
     audioChunks.push(e.data);
     if (rec.state == "inactive") {
       blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
-      var buffer = new Buffer(blob, "binary");
+      // var buffer = new Buffer(blob, "binary");
 
       // CREATE URL for the mp3 blob
-      // urlMP3 = URL.createObjectURL(blob);
+      urlMP3 = URL.createObjectURL(blob);
       recordedAudio.src = URL.createObjectURL(blob);
       recordedAudio.controls = true;
       recordedAudio.autoplay = true;
 
       // Send Data
-      sendData(buffer);
+      sendData(urlMP3);
       console.log("Sent: " + urlMP3);
 
       // reader.readAsDataURL(blob);

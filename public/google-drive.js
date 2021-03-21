@@ -54,13 +54,13 @@ export class Googl {
     // Load client secrets from a local file.
   }
 
-  handleFile(name, body) {
+  handleFile(name, body, method) {
     var that = this;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
       //authorize(JSON.parse(content), listFiles);
-      that.authorize(JSON.parse(content), that.uploadFile, name, body);
+      that.authorize(JSON.parse(content), method, name, body);
       // authorize(JSON.parse(content), uploadFile);
     });
   }

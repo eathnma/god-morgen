@@ -5,6 +5,7 @@ var googl = new Googl();
 import path, {dirname} from "path";
 const port = 1500;
 
+// import express from "../node_modules/express/index.js";
 import express from "express";
 const app = express();
 
@@ -35,7 +36,8 @@ app.get("/", (req, res) => {
 // grab blob
 app.post("/sendBlob", (req, res) => {
   console.log(req);
-  googl.handleFile("screaming", req);
+  // file handling - uploading file
+  googl.handleFile("screaming", req, googl.uploadFile);
 });
 
 //heroku deployment
