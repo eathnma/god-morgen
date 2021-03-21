@@ -54,19 +54,30 @@ export class Googl {
     // Load client secrets from a local file.
   }
 
-  handleFile(name, body, method) {
+  handleFile(fileID, body, method) {
     var that = this;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
       //authorize(JSON.parse(content), listFiles);
-      that.authorize(JSON.parse(content), method, name, body);
+      that.authorize(JSON.parse(content), method, fileID, body);
       // authorize(JSON.parse(content), uploadFile);
     });
   }
 
+  printFile(fileId) {
+    var request = gapi.client.drive.files.get({
+      fileId: fileId,
+    });
+    request.execute(function (resp) {
+      console.log("Title: " + resp.title);
+      console.log("Description: " + resp.description);
+      console.log("MIME type: " + resp.mimeType);
+    });
+  }
+
   // authorize ;.;
-  authorize(credentials, callback, name, body) {
+  authorize(credentials, callback, fileID, body) {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id,
@@ -78,49 +89,52 @@ export class Googl {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getAccessToken(oAuth2Client, callback);
       oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client, name, body); //list files and upload file
-      //callback(oAuth2Client, '0B79LZPgLDaqESF9HV2V3YzYySkE');//get file
+      callback(oAuth2Client, fileID, body); //list files and upload file
     });
   }
 
-  listFiles(auth) {
+  listFiles(auth, useless1, useless2) {
     const drive = google.drive({version: "v3", auth});
+
+    function getList(drive, pageToken) {
+      drive.files.list(
+        {
+          // corpora: "user",
+          // pageSize: 10,
+          // q: "name='hello'",
+          // pageToken: pageToken ? pageToken : "",
+          // fields: "nextPageToken, files(*)",
+        },
+        (err, res) => {
+          if (err) return console.log("The API returned an error: " + err);
+          const files = res.data.files;
+          if (files.length) {
+            console.log("Files:");
+            // processList(files);
+            console.log(files);
+            if (res.data.nextPageToken) {
+              getList(drive, res.data.nextPageToken);
+            }
+
+            // files.map((file) => {
+            //     console.log(`${file.name} (${file.id})`);
+            // });
+          } else {
+            console.log("No files found.");
+          }
+        }
+      );
+    }
+
     getList(drive, "");
   }
 
-  //   getList(drive, pageToken) {
-  //     drive.files.list(
-  //       {
-  //         corpora: "user",
-  //         pageSize: 10,
-  //         //q: "name='elvis233424234'",
-  //         pageToken: pageToken ? pageToken : "",
-  //         fields: "nextPageToken, files(*)",
-  //       },
-  //       (err, res) => {
-  //         if (err) return console.log("The API returned an error: " + err);
-  //         const files = res.data.files;
-  //         if (files.length) {
-  //           console.log("Files:");
-  //           processList(files);
-  //           if (res.data.nextPageToken) {
-  //             getList(drive, res.data.nextPageToken);
-  //           }
-
-  //           // files.map((file) => {
-  //           //     console.log(`${file.name} (${file.id})`);
-  //           // });
-  //         } else {
-  //           console.log("No files found.");
-  //         }
-  //       }
-  //     );
-  //   }
-
-  uploadFile(auth, name, body) {
+  // https://developers.google.com/drive/api/v3/create-file
+  // upload file to the drive
+  uploadFile(auth, fileID, body) {
     const drive = google.drive({version: "v3", auth});
     var fileMetadata = {
-      name: name,
+      name: fileID,
     };
 
     var media = {
@@ -146,7 +160,9 @@ export class Googl {
     );
   }
 
-  getFile(auth, fileId) {
+  // https://developers.google.com/drive/api/v3/search-files#node.js
+  // grab file from the drive
+  getFile(auth, fileId, body) {
     const drive = google.drive({version: "v3", auth});
     drive.files.get({fileId: fileId, fields: "*"}, (err, res) => {
       if (err) return console.log("The API returned an error: " + err);

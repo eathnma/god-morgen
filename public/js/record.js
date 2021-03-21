@@ -48,6 +48,35 @@ function sendData(data) {
   xhr.send(data);
 }
 
+// grab song-data onclick
+// on-click, grab the id of the ball too.
+// id should match the ID in the Google Drive
+document.getElementById("getRecord").addEventListener("click", function () {
+  var zion = "ethan.jpg";
+  getData(zion);
+});
+
+// retrieve data
+function getData(id) {
+  // retrieve google code from the backend on button click
+  let request = new XMLHttpRequest();
+  request.open("GET", `/grabMP3/${id}`);
+
+  // listen for
+  request.onreadystatechange = function () {
+    // In local files, status is 0 upon success in Mozilla Firefox
+    if (request.readyState === XMLHttpRequest.DONE) {
+      var status = request.status;
+      if (status === 0 || (status >= 200 && status < 400)) {
+        console.log(request.response);
+      } else {
+        console.log("bad request - backend");
+      }
+    }
+  };
+  request.send();
+}
+
 // start recording
 record.onclick = (e) => {
   console.log("I was clicked");

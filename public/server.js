@@ -33,11 +33,22 @@ app.get("/", (req, res) => {
   res.sendFile("/views/index.html", {root: __dirname});
 });
 
-// grab blob
+// grab blob from frontend & send to Google Drive
 app.post("/sendBlob", (req, res) => {
   console.log(req);
   // file handling - uploading file
-  googl.handleFile("screaming", req, googl.uploadFile);
+  // googl.handleFile("screaming", req, googl.uploadFile);
+});
+
+// grab mp3 from backend
+app.get("/grabMP3/:id", (req, res) => {
+  console.log(req.params.id);
+
+  // const file = googl.handleFile(req.params.id, req, googl.getFile);
+  const file = googl.handleFile("", req, googl.listFiles);
+
+  // var test = "TEST";
+  res.send(file);
 });
 
 //heroku deployment
