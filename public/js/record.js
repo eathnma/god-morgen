@@ -52,7 +52,7 @@ function sendData(data) {
 // on-click, grab the id of the ball too.
 // id should match the ID in the Google Drive
 document.getElementById("getRecord").addEventListener("click", function () {
-  var zion = "ethan.jpg";
+  var zion = "1whKzbviDPmZ1MK7fY4zXh6_XyL8sAVts";
   getData(zion);
 });
 

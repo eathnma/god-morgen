@@ -44,8 +44,13 @@ app.post("/sendBlob", (req, res) => {
 app.get("/grabMP3/:id", (req, res) => {
   console.log(req.params.id);
 
-  // const file = googl.handleFile(req.params.id, req, googl.getFile);
-  const file = googl.handleFile("", req, googl.listFiles);
+  // pass in filled string
+  const file = googl.handleFile(req.params.id, req, googl.getFile);
+
+  console.log(file);
+
+  // pass in empty string and check drive for it
+  // const file = googl.handleFile("", req, googl.listFiles)
 
   // var test = "TEST";
   res.send(file);

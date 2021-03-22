@@ -65,17 +65,6 @@ export class Googl {
     });
   }
 
-  printFile(fileId) {
-    var request = gapi.client.drive.files.get({
-      fileId: fileId,
-    });
-    request.execute(function (resp) {
-      console.log("Title: " + resp.title);
-      console.log("Description: " + resp.description);
-      console.log("MIME type: " + resp.mimeType);
-    });
-  }
-
   // authorize ;.;
   authorize(credentials, callback, fileID, body) {
     const {client_secret, client_id, redirect_uris} = credentials.installed;
@@ -164,9 +153,17 @@ export class Googl {
   // grab file from the drive
   getFile(auth, fileId, body) {
     const drive = google.drive({version: "v3", auth});
-    drive.files.get({fileId: fileId, fields: "*"}, (err, res) => {
-      if (err) return console.log("The API returned an error: " + err);
-      console.log(res.data);
-    });
+    drive.files.get(
+      {
+        fileId: fileId,
+        fields: "*",
+        // this field signals that it's ready to be downloaded?
+        alt: "media",
+      },
+      (err, res) => {
+        if (err) return console.log("The API returned an error: " + err);
+        console.log(res.data);
+      }
+    );
   }
 }
