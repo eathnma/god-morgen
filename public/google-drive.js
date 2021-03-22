@@ -157,8 +157,8 @@ export class Googl {
       {
         fileId: fileId,
         fields: "*",
-        // this field signals that it's ready to be downloaded?
-        alt: "media",
+        // this field signals that it's ready to be downloaded
+        // alt: "media",
       },
       (err, res) => {
         if (err) return console.log("The API returned an error: " + err);
