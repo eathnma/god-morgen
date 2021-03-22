@@ -51,11 +51,18 @@ World.add(world, mouseConstraint);
 render.mouse = mouse;
 
 Events.on(mouseConstraint, 'mousedown', function(event) {
-    var mousePosition = event.mouse.position; 
-    console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+    //START AUDIO 
+    console.log("now recording");
+    
     var newBall = Bodies.circle(event.mouse.position.x, event.mouse.position.y, 40, 10);
     World.add(world, newBall);
 });
+
+Events.on(mouseConstraint, 'mouseup', function(event) {
+    //STOP AUDIO
+    console.log("recording completed");
+});
+
 
 var allBodies = Composite.allBodies(world);
 
