@@ -4,10 +4,11 @@ var Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
     Common = Matter.Common,
-            Composite = Matter.Composite,
-        Composites = Matter.Composites,
+    Composite = Matter.Composite,
+    Composites = Matter.Composites,
     MouseConstraint = Matter.MouseConstraint,
     Mouse = Matter.Mouse,
+    Events = Matter.Events,
     World = Matter.World,
     Bodies = Matter.Bodies;
 
@@ -48,6 +49,11 @@ var mouse = Mouse.create(render.canvas),
 
 World.add(world, mouseConstraint);
 render.mouse = mouse;
+
+Events.on(mouseConstraint, 'mousedown', function(event) {
+    var mousePosition = event.mouse.position; 
+    console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+});
 
 var allBodies = Composite.allBodies(world);
 
