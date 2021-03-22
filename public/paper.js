@@ -1,35 +1,14 @@
 paper.install(window);
+paper.setup('myCanvas');
 
 var person = prompt("Please enter your name", "Harry Potter");
 
-var context;
-var canvas;
-var myWidth;
-var myHeight;
-
-var numBalls = 12;
 var spring = 0.05;
 var gravity = 0.98;
 var friction = -0.4;
-const balls = [];
 const maxSize = 100;
 var index = 0;
 var cursorSize = 30;
-
-window.onload = function(){
-    init();
-//    window.addEventListener('resize', init, false);
-
-}
-
-function init(){
-    while(balls.length < numBalls) {
-        let ball = new Ball(getRandomInt(0, myWidth), getRandomInt(0, myHeight), getRandomInt(30, 70), balls);
-        balls.push(ball);
-    }
-    
-    console.log(balls.length);
-}
 
 function Color(red,green,blue) {
     this.red = red;
@@ -48,14 +27,18 @@ var colors = [blue, green, indigo, mustard, orange, plum];
 
 const cursor = document.querySelector(".cursor");
 
-function mouseMove(event) {
+view.onMouseMove = function(event) {
     mouseX = event.x;
     mouseY = event.y;
-    
-    cursor.style.top = (event.pageY - cursorSize) + "px";
-    cursor.style.left = (event.pageX - cursorSize)+ "px";
+//    
+//    cursor.style.top = (event.pageY - cursorSize) + "px";
+//    cursor.style.left = (event.pageX - cursorSize)+ "px";
+        
+    cursor.style.top = event.x;
+    cursor.style.left = event.y;
     cursor.style.width = cursorSize;
     cursor.style.height = cursorSize;
+    console.log("hello");
 }
 
 var mousedownID = 0;
@@ -65,7 +48,7 @@ var mouseY;
 
 var hoverID = 0;
 
-function onMouseDown(event) {
+view.onMouseDown = function(event) {
     newBall = new Ball(event.x, event.y, cursorSize, balls);
     balls.push(newBall);
 
@@ -74,7 +57,7 @@ function onMouseDown(event) {
     }
 }
 
-function onMouseUp(event) {
+view.onMouseUp = function(event) {
     if (mousedownID != 0) {
         mousedownID = 0;
         newBall.setDrag(false);
@@ -85,6 +68,7 @@ function onMouseUp(event) {
 
 var counter = 0;
 
+
 function createBall(){
     newBall.setSize(1);
     newBall.setPos(mouseX, mouseY); 
@@ -93,136 +77,81 @@ function createBall(){
     console.log("counter: " + counter);
 }
 
-//document.addEventListener("mousedown", mousedown);
-//document.addEventListener("mouseup", mouseup);
-//document.addEventListener("mouseout", mouseup);
-//document.addEventListener("mousemove", mouseMove);
+//var circle = new Path.Circle(new Point(0, 0), 100);
+//circle.fillColor = 'black';
 
-class Ball {
-    x;
-    y;
-    diameter;
-    others;
-    vx;
-    vy;
-    randomColor;
-    drag;
-    
-    constructor(xin, yin, din, oin){
-        this.x = xin;
-        this.y = yin;
-        this.diameter = din;
-        this.others = oin;
-        console.log("x:  " + this.x);
-        this.vx = 0;
-        this.vy = 0;
-        this.randomColor = colors[Math.floor(Math.random() * colors.length)];
-        this.drag = false;
-        
-        paper.setup('myCanvas');
-    }
-        
-    collide(){
-        if (this.drag == false) {
-            for (let i = 0; i < balls.length; i++){
-                let dx = this.others[i].x - this.x;
-                let dy = this.others[i].y - this.y;
-                let distance = Math.sqrt(dx*dx + dy*dy);
-                let minDist = this.others[i].diameter + this.diameter;
-                console.log("UGHHHH");
-                if (distance < minDist) {
-                    let angle = Math.atan2(dy,dx);
-                    let targetX = this.x + Math.cos(angle) * minDist;
-                    let targetY = this.y + Math.sin(angle) * minDist;
-                    let ax = (targetX - this.others[i].x);
-                    let ay = (targetY - this.others[i].y);
-                    this.vx -= ax;
-                    this.vy -= ay;
-                    this.others[i].vx += ax;
-                    this.others[i].vy += ay;
-                    console.log("BUMP");
-                }
-            }
-        }
-    }
-        
-    move(){
-        if (this.drag == false) {
-            this.vy += gravity;
-            this.x += this.vx;
-            this.y += this.vy;
-            if (this.x + this.diameter/2 > myWidth) {
-                this.x = myWidth - this.diameter/2;
-                this.vx *= friction;
-            } else if (this.x - this.diameter/2 < 0) {
-                this.x = this.diameter/2;
-                this.vx *= friction;
-            }
+function Ball(r, p, v){
+    this.radius = r;
+    this.point = p;
+    this.vector = v;
+    this.path = new paper.Path.Circle(this.point, this.radius);
+    this.path.fillColor = 'black';
 
-            if (this.y + this.diameter/2 > myHeight) {
-                this.y = myHeight - this.diameter/2;
-                this.vy *= friction;
-            } else if (this.y - this.diameter/2 < 0) {
-                this.y = this.diameter/2;
-                this.vy *= friction;
-            }
-        }
-    }
-        
-    display(){
-        let myCircle = new Path.Circle(new Point(this.x, this.y), this.diameter);
-        myCircle.fillColor = 'black';
-    }      
-    
-    setDrag(bool){
-        this.drag = bool;
-    }
-    
-    setPos(xin, yin){
-        this.x = xin;
-        this.y = yin;
-    }
-        
-    setSize(num){
-        if (this.diameter < maxSize) this.diameter += num;
-    }
-    
-    getX() {
-        return this.x;
-    }
-
-    getY() {
-        return this.y;
-    }
+//    this.path.fillColor = colors[Math.floor(Math.random() * colors.length)];
 }
 
-function getRandomInt(min, max){
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
-function onFrame(event) {
-    console.log("onFrame");
-
-            var testBall = new Path.Circle(new Point(100, 100), 100);
+Ball.prototype = {
     
-    for (let i = 0; i < balls.length; i++){
-        let ball = balls[i];
-        ball.collide();
-        ball.move();
-        ball.display();
-        
-
-        if (mouseX > ball.x - ball.diameter && mouseX < ball.x + ball.diameter && mouseY > ball.y - ball.diameter && mouseY < ball.y + ball.diameter) {
-            document.querySelector("canvas").style.background = "blue"; 
-        } else {
-             document.querySelector("canvas").style.background = "white";
-        }
-        
-        if (person != null) document.getElementById("message").innerHTML = balls.length;
-        }
+    iterate: function() {
+        this.checkBorders();
+        this.point += this.vector;
+//        console.log("point:" + this.point);
+    },
+    
+    checkBorders: function() {
+        var size = view.size;
+        if (this.point.x < -this.radius)
+            this.vector.x *= -1;
+        if (this.point.x > size.width + this.radius)
+            this.vector.x *= -1;
+        if (this.point.y < -this.radius)
+            this.vector.y *= -1;
+        if (this.point.y > size.height + this.radius)
+            this.vector.y *= -1;
+    },
+    
+    react: function(b) {
+//        var dist = this.point.getDistance(b.point);
+//        if (dist < this.radius + b.radius && dist != 0)
+//            var overlap = this.radius + b.radius - dist;
+//            var direc = (this.point - b.point).normalize(overlap * 0.015);
+//            this.vector += direc;
+//            b.vector -= direc;
     }
-  
-function addBall(xin, yin){
-    let ball = new Ball(xin, yin, getRandomInt(30, 70), index, balls);
-    balls.push(ball);
+
 }
+
+var balls = [];
+var numBalls = 12;
+
+for (var i = 0; i < numBalls; i++) {
+	var position = new Point(view.size.width, view.size.height) * Point.random();
+    console.log("position: " + position);
+//	var vector = new Point({
+//		angle: 360 * Math.random(),
+//		length: Math.random() * 10
+//	});
+    
+    var vector = new Point(5, 5);
+	var radius = Math.random() * 60 + 60;
+	balls.push(new Ball(radius, position, vector));
+}
+
+console.log("width" + view.size.width);
+console.log("height" + view.size.height);
+
+view.onFrame = function(event) {
+    console.log(event.count);
+	for (var i = 0; i < balls.length - 1; i++) {
+		for (var j = i + 1; j < balls.length; j++) {
+			balls[i].react(balls[j]);
+		}
+	}
+    
+	for (var i = 0, l = balls.length; i < l; i++) {
+		balls[i].iterate();
+//        console.log("test" + i);
+	}
+}
+
+paper.view.draw()
