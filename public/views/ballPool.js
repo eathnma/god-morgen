@@ -53,6 +53,8 @@ render.mouse = mouse;
 Events.on(mouseConstraint, 'mousedown', function(event) {
     var mousePosition = event.mouse.position; 
     console.log('mousedown at ' + mousePosition.x + ' ' + mousePosition.y);
+    var newBall = Bodies.circle(event.mouse.position.x, event.mouse.position.y, 40, 10);
+    World.add(world, newBall);
 });
 
 var allBodies = Composite.allBodies(world);
