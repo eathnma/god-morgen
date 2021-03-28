@@ -10,6 +10,7 @@
             <p>
                 <button id=record>Start</button>
                 <button id=stopRecord disabled>Stop</button>
+                <button id="getRecord">Get Recording</button>
             </p>
             <p>
                 <audio id=recordedAudio></audio>
@@ -18,26 +19,6 @@
 
       <!-- recording audio files within the app -->
       <script type="text/javascript" src="../js/record.js"></script>
-    
-      <!-- playing mp3 files directly from the google drive -->
-      <!-- https://portalzine.de/dev/html5/hosting-mp3-files-on-google-drive-html5-audio-player/ -->
-      <script type="text/javascript">
-
-        // var fileId = '1WVpKadJ2TuIDNiDb2L6TJOas1GJx_Fs2';
-        // var dest = fs.createWriteStream('/tmp/photo.jpg');
-        // drive.files.get({
-        //   fileId: fileId,
-        //   alt: 'media'
-        // })
-        //     .on('end', function () {
-        //       console.log('Done');
-        //     })
-        //     .on('error', function (err) {
-        //       console.log('Error during download', err);
-        //     })
-        //     .pipe(dest);
-
-      </script>
 
     </body>
 

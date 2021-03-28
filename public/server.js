@@ -10,7 +10,6 @@ const app = express();
 
 import ejs from "ejs";
 import {fileURLToPath} from "url";
-import bodyParser from "body-parser";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -18,12 +17,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import http from "http";
 const server = http.createServer(app);
 
-// const __dirname = path.resolve(path.dirname(""));
-
-app.use(bodyParser.urlencoded());
-
 app.use(express.static("public"));
 app.use("/js", express.static(__dirname + "/js"));
+
+app.use(express.json());
 
 app.set("views", path.join(__dirname, "/views"));
 app.engine("html", ejs.renderFile);
@@ -32,10 +29,28 @@ app.get("/", (req, res) => {
   res.sendFile("/views/index.html", {root: __dirname});
 });
 
-// grab blob
+// // grab blob
 app.post("/sendBlob", (req, res) => {
-  console.log(req.body);
-  googl.handleFile("screaming", req.body);
+  req.on("readable", function () {
+    var newread = req.read();
+    if (newread != null) {
+      // (name, blob, method)
+      // newread is a buffer??
+      googl.handleFile("url randomizer", newread, googl.uploadFile);
+    }
+  });
+});
+
+// grab mp3 from backend
+app.get("/grabMP3/:id", (req, res) => {
+  console.log("backend id: " + req.params.id);
+
+  const file = googl.handleFile(req.params.id, "", googl.getFile);
+
+  // pass in empty string and check drive for it
+  // const file = googl.handleFile("", req, googl.listFiles);
+  // console.log(file);
+  // res.send(file);
 });
 
 //heroku deployment

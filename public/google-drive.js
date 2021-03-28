@@ -3,6 +3,8 @@ import fs from "fs";
 import readline from "readline";
 import {google} from "googleapis";
 
+import http from "http";
+
 //Drive API, v3
 //https://www.googleapis.com/auth/drive	See, edit, create, and delete all of your Google Drive files
 //https://www.googleapis.com/auth/drive.file View and manage Google Drive files and folders that you have opened or created with this app
@@ -54,14 +56,13 @@ export class Googl {
     // Load client secrets from a local file.
   }
 
-  handleFile(name, blob) {
+  handleFile(name, blob, method) {
     var that = this;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
-      //authorize(JSON.parse(content), listFiles);
-      that.authorize(JSON.parse(content), that.uploadFile, name, blob);
-      // authorize(JSON.parse(content), uploadFile);
+      that.authorize(JSON.parse(content), method, name, blob);
+      //somehow get a return function??
     });
   }
 
@@ -79,7 +80,6 @@ export class Googl {
       if (err) return getAccessToken(oAuth2Client, callback);
       oAuth2Client.setCredentials(JSON.parse(token));
       callback(oAuth2Client, name, blob); //list files and upload file
-      //callback(oAuth2Client, '0B79LZPgLDaqESF9HV2V3YzYySkE');//get file
     });
   }
 
@@ -88,45 +88,59 @@ export class Googl {
     getList(drive, "");
   }
 
-  //   getList(drive, pageToken) {
-  //     drive.files.list(
-  //       {
-  //         corpora: "user",
-  //         pageSize: 10,
-  //         //q: "name='elvis233424234'",
-  //         pageToken: pageToken ? pageToken : "",
-  //         fields: "nextPageToken, files(*)",
-  //       },
-  //       (err, res) => {
-  //         if (err) return console.log("The API returned an error: " + err);
-  //         const files = res.data.files;
-  //         if (files.length) {
-  //           console.log("Files:");
-  //           processList(files);
-  //           if (res.data.nextPageToken) {
-  //             getList(drive, res.data.nextPageToken);
-  //           }
+  getList(drive, pageToken) {
+    drive.files.list(
+      {
+        corpora: "user",
+        pageSize: 10,
+        //q: "name='elvis233424234'",
+        pageToken: pageToken ? pageToken : "",
+        fields: "nextPageToken, files(*)",
+      },
+      (err, res) => {
+        if (err) return console.log("The API returned an error: " + err);
+        const files = res.data.files;
+        if (files.length) {
+          console.log("Files:");
+          processList(files);
+          if (res.data.nextPageToken) {
+            getList(drive, res.data.nextPageToken);
+          }
 
-  //           // files.map((file) => {
-  //           //     console.log(`${file.name} (${file.id})`);
-  //           // });
-  //         } else {
-  //           console.log("No files found.");
-  //         }
-  //       }
-  //     );
-  //   }
+          // files.map((file) => {
+          //     console.log(`${file.name} (${file.id})`);
+          // });
+        } else {
+          console.log("No files found.");
+        }
+      }
+    );
+  }
 
   uploadFile(auth, name, blob) {
     const drive = google.drive({version: "v3", auth});
     var fileMetadata = {
-      name: name,
+      name: `${name}.mp3`,
     };
+    // var buf = Buffer.from(blob, 'base64');
+    // console.log("AEEE" + typeof(blob);
+    var filepath = "file.mp3";
 
+    // Save with a buffer as content from a base64 image
+    // fs.writeFile(filepath, new Buffer(blob, "base64"), (err) => {
+    //     if (err) throw err;
+
+    //     console.log("The file was succesfully saved!");
+    // });
+    try {
+      fs.writeFileSync(filepath, blob);
+    } catch (e) {
+      console.log("Cannot write file ", e);
+    }
     var media = {
       // if not, use "audio/mpeg3"
-      mimeType: "audio/mpeg-3",
-      body: fs.createReadStream(blob),
+      mimeType: "audio/mp3",
+      body: fs.createReadStream(filepath),
     };
 
     drive.files.create(
@@ -150,8 +164,8 @@ export class Googl {
     const drive = google.drive({version: "v3", auth});
     drive.files.get({fileId: fileId, fields: "*"}, (err, res) => {
       if (err) return console.log("The API returned an error: " + err);
+      // prints out res.data
       console.log(res.data);
-      c;
     });
   }
 }
