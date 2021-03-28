@@ -10,7 +10,7 @@
             <p>
                 <button id=record>Start</button>
                 <button id=stopRecord disabled>Stop</button>
-                <button id="getRecord">Get Recording</button>
+                <button id="getRecord" onclick="playSound()">Get Recording</button>
             </p>
             <p>
                 <audio id=recordedAudio></audio>
@@ -19,6 +19,15 @@
 
       <!-- recording audio files within the app -->
       <script type="text/javascript" src="../js/record.js"></script>
+      <script type="text/javascript">
+
+          function playSound() {
+            var a = new Audio("https://docs.google.com/uc?export=download&id=1nQklEicsMeGBnuk0vv6zkHtXtyGy10S-");
+            a.play();
+          }
+
+
+      </script>
 
     </body>
 

@@ -58,16 +58,18 @@ export class Googl {
 
   handleFile(name, blob, method) {
     var that = this;
+    var handleByte;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
-      that.authorize(JSON.parse(content), method, name, blob);
-      //somehow get a return function??
+      handleByte = that.authorize(JSON.parse(content), method, name, blob);
     });
+    // return handleByte;
   }
 
   // authorize ;.;
   authorize(credentials, callback, name, blob) {
+    var bytes;
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
       client_id,
@@ -79,7 +81,9 @@ export class Googl {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getAccessToken(oAuth2Client, callback);
       oAuth2Client.setCredentials(JSON.parse(token));
-      callback(oAuth2Client, name, blob); //list files and upload file
+      // how to get a callback from this?!?!
+      bytes = callback(oAuth2Client, name, blob);
+      console.log(bytes);
     });
   }
 
@@ -106,7 +110,6 @@ export class Googl {
           if (res.data.nextPageToken) {
             getList(drive, res.data.nextPageToken);
           }
-
           // files.map((file) => {
           //     console.log(`${file.name} (${file.id})`);
           // });
@@ -162,10 +165,19 @@ export class Googl {
 
   getFile(auth, fileId) {
     const drive = google.drive({version: "v3", auth});
-    drive.files.get({fileId: fileId, fields: "*"}, (err, res) => {
-      if (err) return console.log("The API returned an error: " + err);
-      // prints out res.data
-      console.log(res.data);
+    var grab = drive.files.get(
+      {
+        fileId: fileId,
+        alt: "media",
+      },
+      {
+        responseType: "arraybuffer",
+      }
+    );
+    grab.then(function (res) {
+      // grabbing arraybuffer mp3?
+      // console.log(res.data);
+      return res.data;
     });
   }
 }
