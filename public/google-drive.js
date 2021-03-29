@@ -83,6 +83,7 @@ export class Googl {
       oAuth2Client.setCredentials(JSON.parse(token));
       // the reason it's undefined is because the response runs before it is finished?
       // callback(oAuth2Client, name).then(console.log);
+
       (async () => {
         let response = await that.getFile(oAuth2Client, name);
         console.log("response: " + response);
@@ -162,12 +163,6 @@ export class Googl {
     // console.log("AEEE" + typeof(blob);
     var filepath = "file.mp3";
 
-    // Save with a buffer as content from a base64 image
-    // fs.writeFile(filepath, new Buffer(blob, "base64"), (err) => {
-    //     if (err) throw err;
-
-    //     console.log("The file was succesfully saved!");
-    // });
     try {
       fs.writeFileSync(filepath, blob);
     } catch (e) {
