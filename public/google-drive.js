@@ -56,13 +56,47 @@ export class Googl {
     // Load client secrets from a local file.
   }
 
+  // handling files
+  handleFileGet(name) {
+    var that = this;
+    var handleByte;
+    fs.readFile("credentials.json", (err, content) => {
+      if (err) return console.log("Error loading client secret file:", err);
+      //Authorize a client with credentials, then call the Google Drive API.
+      that.authorizeGet(JSON.parse(content), that.getFile, name);
+    });
+  }
+
+  async authorizeGet(credentials, callback, name) {
+    var bytes;
+    var that = this;
+    const {client_secret, client_id, redirect_uris} = credentials.installed;
+    const oAuth2Client = new google.auth.OAuth2(
+      client_id,
+      client_secret,
+      redirect_uris[0]
+    );
+
+    // Check if we have previously stored a token.
+    fs.readFile(TOKEN_PATH, (err, token) => {
+      if (err) return getAccessToken(oAuth2Client, callback);
+      oAuth2Client.setCredentials(JSON.parse(token));
+      // the reason it's undefined is because the response runs before it is finished?
+      // callback(oAuth2Client, name).then(console.log);
+      (async () => {
+        let response = await that.getFile(oAuth2Client, name);
+        console.log("response: " + response);
+      })();
+    });
+  }
+
   handleFile(name, blob, method) {
     var that = this;
     var handleByte;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
-      handleByte = that.authorize(JSON.parse(content), method, name, blob);
+      that.authorize(JSON.parse(content), method, name, blob);
     });
     // return handleByte;
   }
@@ -81,9 +115,8 @@ export class Googl {
     fs.readFile(TOKEN_PATH, (err, token) => {
       if (err) return getAccessToken(oAuth2Client, callback);
       oAuth2Client.setCredentials(JSON.parse(token));
-      // how to get a callback from this?!?!
-      bytes = callback(oAuth2Client, name, blob);
-      console.log(bytes);
+
+      callback(oAuth2Client, name, blob);
     });
   }
 
@@ -163,7 +196,7 @@ export class Googl {
     );
   }
 
-  getFile(auth, fileId) {
+  async getFile(auth, fileId) {
     const drive = google.drive({version: "v3", auth});
     var grab = drive.files.get(
       {
@@ -174,10 +207,17 @@ export class Googl {
         responseType: "arraybuffer",
       }
     );
-    grab.then(function (res) {
-      // grabbing arraybuffer mp3?
-      // console.log(res.data);
-      return res.data;
-    });
+
+    grab
+      .then((res) => {
+        // grabbing arraybuffer mp3?
+        var data = res.data;
+        console.log(data);
+        return data;
+      })
+      .catch((err) => {
+        // print out error statement
+        console.log(err);
+      });
   }
 }
