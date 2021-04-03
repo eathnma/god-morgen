@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+       <meta charset="UTF-8">
        <title>Audio Recording</title>
-       <!-- <style> put css here </style> -->
+       <link rel="stylesheet" href="../css/main.css">
     </head>
     <body>
-        <p>listen to ya coworkers</p>
+        <h1 id="message">Good morning</h1>
         <div class="holder">
             <p>
                 <button id=record>Start</button>
@@ -17,18 +18,16 @@
             </p>
         </div>
 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.15.0/matter.js" integrity="sha512-UaY4FNIBFf6VpFSarE1a1b1vdoxo5mvLt4+MtEMpMrCARnf0gnEdAonEHhA9U0M7P9MdaaIxN9VWuAE9udGg0w==" crossorigin="anonymous"></script>
+        
       <!-- recording audio files within the app -->
+
       <script type="text/javascript" src="../js/record.js"></script>
       <script type="text/javascript">
-
           function playSound() {
             var a = new Audio("https://docs.google.com/uc?export=download&id=1nQklEicsMeGBnuk0vv6zkHtXtyGy10S-");
             a.play();
           }
-
-
       </script>
-
     </body>
-
 </html>
