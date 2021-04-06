@@ -1,9 +1,12 @@
 // GOOGLE DRIVE API
 import fs from "fs";
+import {promises} from "fs";
 import readline from "readline";
 import {google} from "googleapis";
 
 import http from "http";
+import {default as fsWithCallbacks} from "fs";
+const fsSomething = fsWithCallbacks.promises;
 
 //Drive API, v3
 //https://www.googleapis.com/auth/drive	See, edit, create, and delete all of your Google Drive files
@@ -57,18 +60,28 @@ export class Googl {
   }
 
   // handling files
-  handleFileGet(name) {
+  async handleFileGet(name) {
     var that = this;
     var handleByte;
-    fs.readFile("credentials.json", (err, content) => {
-      if (err) return console.log("Error loading client secret file:", err);
-      //Authorize a client with credentials, then call the Google Drive API.
-      that.authorizeGet(JSON.parse(content), that.getFile, name);
-    });
+    var getFrontend = await fsSomething
+      .readFile("credentials.json")
+      .then((content) => {
+        //Authorize a client with credentials, then call the Google Drive API.
+        handleByte = that.authorizeGet(JSON.parse(content), name);
+        // console.log(handleByte);
+        return handleByte;
+      })
+      .catch((err) => {
+        if (err) return console.log("Error loading client secret file:", err);
+      });
+
+    // console.log(getFrontend);
+    return getFrontend;
   }
 
-  async authorizeGet(credentials, callback, name) {
-    var bytes;
+  async authorizeGet(credentials, name) {
+    var responseLayer;
+    var test;
     var that = this;
     const {client_secret, client_id, redirect_uris} = credentials.installed;
     const oAuth2Client = new google.auth.OAuth2(
@@ -78,22 +91,27 @@ export class Googl {
     );
 
     // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-      if (err) return getAccessToken(oAuth2Client, callback);
-      oAuth2Client.setCredentials(JSON.parse(token));
-      // the reason it's undefined is because the response runs before it is finished?
-      // callback(oAuth2Client, name).then(console.log);
+    responseLayer = await fsSomething.readFile(TOKEN_PATH).then((token) => {
+      // console.log(token);
+      oAuth2Client.setCredentials(JSON.parse(token.toString()));
 
-      (async () => {
-        let response = await that.getFile(oAuth2Client, name);
-        console.log("response: " + response);
-      })();
+      return that
+        .getFile(oAuth2Client, name)
+        .then((data) => {
+          // console.log(data);
+          return data;
+        })
+        .catch((err) => {
+          if (err) return getAccessToken(oAuth2Client, this.handleFile);
+        });
     });
+    return responseLayer;
   }
+
+  async doSomething(callback) {}
 
   handleFile(name, blob, method) {
     var that = this;
-    var handleByte;
     fs.readFile("credentials.json", (err, content) => {
       if (err) return console.log("Error loading client secret file:", err);
       //Authorize a client with credentials, then call the Google Drive API.
@@ -192,6 +210,7 @@ export class Googl {
   }
 
   async getFile(auth, fileId) {
+    var data;
     const drive = google.drive({version: "v3", auth});
     var grab = drive.files.get(
       {
@@ -203,16 +222,17 @@ export class Googl {
       }
     );
 
-    grab
+    var a = grab
       .then((res) => {
         // grabbing arraybuffer mp3?
-        var data = res.data;
-        console.log(data);
+        data = res.data;
+        // console.log(data);
         return data;
       })
       .catch((err) => {
         // print out error statement
         console.log(err);
       });
+    return a;
   }
 }

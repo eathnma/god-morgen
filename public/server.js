@@ -42,10 +42,12 @@ app.post("/sendBlob", (req, res) => {
 });
 
 // grab mp3 from backend
-app.get("/grabMP3/:id", (req, res) => {
+app.get("/grabMP3/:id", async (req, res) => {
   console.log("backend id: " + req.params.id);
 
-  var file = googl.handleFileGet(req.params.id);
+  var file = await googl.handleFileGet(req.params.id);
+  console.log(file);
+
   // need to extract the ArrayBuffer
   // console.log(file);
   // res.send(file);
