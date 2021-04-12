@@ -34,8 +34,6 @@ app.post("/sendBlob", (req, res) => {
   req.on("readable", function () {
     var newread = req.read();
     if (newread != null) {
-      // (name, blob, method)
-      // newread is a buffer??
       googl.handleFile("url randomizer", newread, googl.uploadFile);
     }
   });
@@ -45,12 +43,19 @@ app.post("/sendBlob", (req, res) => {
 app.get("/grabMP3/:id", async (req, res) => {
   console.log("backend id: " + req.params.id);
 
-  var file = await googl.handleFileGet(req.params.id);
-  console.log(file);
+  try {
+    var file = await googl.handleFileGet(req.params.id);
+    var enc = new TextDecoder("utf-8");
 
-  // need to extract the ArrayBuffer
-  // console.log(file);
-  // res.send(file);
+    // console.log(file);
+    // console.log(enc.decode(file));
+    // var decodedString = new TextDecoder().decode(file);
+    // console.log(decodedString);
+
+    res.send(file);
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 //heroku deployment
