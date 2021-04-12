@@ -2,31 +2,46 @@
 <html lang="en">
     <head>
        <meta charset="UTF-8">
-       <title>Audio Recording</title>
+       <title>Good Morning</title>
        <link rel="stylesheet" href="../css/main.css">
     </head>
     <body>
+
         <h1 id="message">Good morning</h1>
         <div class="holder">
             <p>
-                <button id=record>Start</button>
-                <button id=stopRecord disabled>Stop</button>
-                <button id="getRecord" onclick="playSound()">Get Recording</button>
+                <button id=record hidden>Start</button>
+                <button id=stopRecord disabled hidden>Stop</button>
+                <button id="getRecord" onclick="playSound()" hidden>Get Recording</button>
             </p>
             <p>
-                <audio id=recordedAudio></audio>
+                <audio id=recordedAudio hidden></audio>
             </p>
         </div>
-
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.15.0/matter.js" integrity="sha512-UaY4FNIBFf6VpFSarE1a1b1vdoxo5mvLt4+MtEMpMrCARnf0gnEdAonEHhA9U0M7P9MdaaIxN9VWuAE9udGg0w==" crossorigin="anonymous"></script>
+        <div class="cursor"></div>
+<!--        <script type="text/javascript" src="../js/cursor.js"></script>-->
+<!--        <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.15.0/matter.js" integrity="sha512-UaY4FNIBFf6VpFSarE1a1b1vdoxo5mvLt4+MtEMpMrCARnf0gnEdAonEHhA9U0M7P9MdaaIxN9VWuAE9udGg0w==" crossorigin="anonymous"></script>-->
         
       <!-- recording audio files within the app -->
+<!--
+      <div id="onboarding">
+        <form id="nameForm" onsubmit="closeOverlay()">
+            <label for="name" hidden>Name</label><br>
+            <input type="text" id="name" placeholder="Name"><br>
+            <input type="submit" value="Go">
+        </form>
+      </div>
+-->
 
+      <script type="text/javascript" src="../js/matter.js"></script>
       <script type="text/javascript" src="../js/record.js"></script>
       <script type="text/javascript">
           function playSound() {
             var a = new Audio("https://docs.google.com/uc?export=download&id=1nQklEicsMeGBnuk0vv6zkHtXtyGy10S-");
             a.play();
+          }
+          
+        function closeOverlay(){            document.getElementById("onboarding").style.display="none";
           }
       </script>
     </body>

@@ -1,5 +1,8 @@
 var person = prompt("Please enter your name", "Harry Potter");
 
+
+//var person = document.getElementById("name").value;
+//    
 var blue = 'rgb(88, 168, 253)';
 var green = 'rgb(32, 190, 114)';
 var indigo = 'rgb(90, 96, 254)';
@@ -8,9 +11,8 @@ var orange = 'rgb(248, 84, 48)';
 var plum = 'rgb(143, 23, 97)';
 
 var colors = [blue, green, indigo, mustard, orange, plum];
+var names = ["Ashley", "Brendan", "Carman", "Darya", "Ethan", "Frank", "Giorgia", "Hason", "Ian", "Justin", "Kelly", "Lucy", "Melanie", "Norman", "Ola", "Peggy", "Quinn", "Rodney", "Samantha", "Tiffany", "Vincent", "Winnie", "Yan", "Zoe"]
 
-this.randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
 var Engine = Matter.Engine,
     Render = Matter.Render,
     Runner = Matter.Runner,
@@ -75,6 +77,66 @@ var listeningID = 0;
 var counter = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
+
+//for (var i = 0; i < 10; i++) {
+//    var ball = Bodies.circle(Math.random(window.innerWidth), window.innerHeight/2, Math.random(60, maxSize), {
+//        render: {    
+//            fillStyle: colors[Math.floor(Math.random() * colors.length)],
+//                    
+//            text: {
+//                content: "test",
+//                size: 16
+//            }
+//        }
+//    });
+//    World.add(world, [ball]);
+//}
+
+//
+//var sampleBall = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
+//    render: {
+//                    
+//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
+//                    text: {
+//                        content: names[Math.floor(Math.random() * names.length)],
+//                        size: 16
+//                    }
+//    }
+//});
+//
+//var sampleBall2 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
+//    render: {
+//                    
+//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
+//                    text: {
+//                        content: names[Math.floor(Math.random() * names.length)],
+//                        size: 16
+//                    }
+//    }
+//});
+//
+//var sampleBall3 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
+//    render: {
+//                    
+//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
+//                    text: {
+//                        content: names[Math.floor(Math.random() * names.length)],
+//                        size: 16
+//                    }
+//    }
+//});
+//
+//var sampleBall4 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
+//    render: {
+//                    
+//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
+//                    text: {
+//                        content: names[Math.floor(Math.random() * names.length)],
+//                        size: 16
+//                    }
+//    }
+//});
+
 var ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight+15, window.innerWidth, 30, { isStatic: true });
 World.add(world, [ground]);
 
@@ -98,6 +160,15 @@ Events.on(engine, 'beforeUpdate', function(event) {
     }
 });
 
+const cursor = document.querySelector(".cursor");
+
+function moveMouse(e) {
+    cursor.style.top = (e.pageY - 30) + "px";
+    cursor.style.left = (e.pageX - 30)+ "px";
+}
+
+//window.addEventListener("mousemove", moveMouse);
+
 //Check hover on balls
 Matter.Events.on(mouseConstraint, 'mousemove', function(event) {
     var bodies = Matter.Composite.allBodies(world);
@@ -109,6 +180,9 @@ Matter.Events.on(mouseConstraint, 'mousemove', function(event) {
     } else {
         listeningID = 0;
     }
+    
+    cursor.style.top = (event.mouse.position.y - 30) + "px";
+    cursor.style.left = (event.mouse.position.x - 30)+ "px";
 });
 
 // Front-End File //
@@ -152,9 +226,20 @@ function handlerFunction(stream) {
             };
 
             //create ball
-            newBall = Bodies.circle(event.mouse.position.x, event.mouse.position.y, 40, {
+            newBall = Bodies.circle(event.mouse.position.x, event.mouse.position.y, 60, {
                 render: {
-                    fillStyle: colors[Math.floor(Math.random() * colors.length)]
+                    
+                    fillStyle: colors[Math.floor(Math.random() * colors.length)],
+                    
+                    //TEXT GOES HERE, ETHAN!!!!!!!!!!!!!!!!!!!!!!!!
+                    text: {
+                        content: person,
+                        size: 16
+                    }
+//                    
+//                    sprite: {
+//                        texture: './assets/face.png',
+//                    }
                 }
             });
             World.add(world, newBall);
