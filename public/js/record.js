@@ -64,9 +64,9 @@ function getData(id) {
       if (status === 0 || (status >= 200 && status < 400)) {
         // var arrayBuffer = new Uint8Array();
         // response.arrayBuffer().then;
-        var uint8array = new TextEncoder().encode(request.response);
+        // var uint8array = new TextEncoder().encode(request.response);
         // var stringMp3 = uint8arrayToStringMethod(uint8array);
-        console.log(uint8Array);
+        console.log(request.response);
         // playByteArray(uint8array);
         // playByteArray(request.response);
       } else {

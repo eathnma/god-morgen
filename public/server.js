@@ -15,6 +15,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // socket.io code
 import http from "http";
+
+// helps to import from
+import bufferify from "json-bufferify";
+
 const server = http.createServer(app);
 
 app.use(express.static("public"));
@@ -49,10 +53,10 @@ app.get("/grabMP3/:id", async (req, res) => {
 
     // console.log(file);
     // console.log(enc.decode(file));
-    // var decodedString = new TextDecoder().decode(file);
+    var decodedString = new TextDecoder().decode(file);
     // console.log(decodedString);
 
-    res.send(file);
+    res.send(decodedString);
   } catch (e) {
     console.log(e);
   }
