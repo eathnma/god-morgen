@@ -1,8 +1,15 @@
-var person = prompt("Please enter your name", "Harry Potter");
+//var person = prompt("Please enter your name", "Harry Potter");
+
+var person;
+var overlay = document.getElementById("onboarding");
+
+function closeOverlay(){
+    person = document.getElementById("name").value;
+    overlay.remove();
+}
 
 
-//var person = document.getElementById("name").value;
-//    
+
 var blue = 'rgb(88, 168, 253)';
 var green = 'rgb(32, 190, 114)';
 var indigo = 'rgb(90, 96, 254)';
@@ -39,7 +46,7 @@ var render = Render.create({
         width: window.innerWidth,
         height: window.innerHeight,
         wireframes: false,
-        background: 'white'
+        background: '#fcfcfc'
     }
 });
 
@@ -72,73 +79,101 @@ var foundBall;
 var mouseDownID = 0; 
 var lastSize = 40; //size of most recently added ball
 const maxSize = 300;
-const minSize = 10;
+const minSize = 60;
 var listeningID = 0;
 var counter = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
 
-//for (var i = 0; i < 10; i++) {
-//    var ball = Bodies.circle(Math.random(window.innerWidth), window.innerHeight/2, Math.random(60, maxSize), {
-//        render: {    
-//            fillStyle: colors[Math.floor(Math.random() * colors.length)],
-//                    
-//            text: {
-//                content: "test",
-//                size: 16
-//            }
-//        }
-//    });
-//    World.add(world, [ball]);
-//}
 
-//
-//var sampleBall = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
-//    render: {
-//                    
-//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
-//                    text: {
-//                        content: names[Math.floor(Math.random() * names.length)],
-//                        size: 16
-//                    }
-//    }
-//});
-//
-//var sampleBall2 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
-//    render: {
-//                    
-//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
-//                    text: {
-//                        content: names[Math.floor(Math.random() * names.length)],
-//                        size: 16
-//                    }
-//    }
-//});
-//
-//var sampleBall3 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
-//    render: {
-//                    
-//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
-//                    text: {
-//                        content: names[Math.floor(Math.random() * names.length)],
-//                        size: 16
-//                    }
-//    }
-//});
-//
-//var sampleBall4 = Bodies.circle(Math.random(window.innerWidth), 100, 60, {
-//    render: {
-//                    
-//        fillStyle: colors[Math.floor(Math.random() * colors.length)],
-//                    text: {
-//                        content: names[Math.floor(Math.random() * names.length)],
-//                        size: 16
-//                    }
-//    }
-//});
+var topWall = Bodies.rectangle(window.innerWidth/2, -25, window.innerWidth, 50, { 
+    isStatic: true, 
+    render: { 
+        fillStyle: 'white',
+    }
+});
+    
+var leftWall = Bodies.rectangle(-25, window.innerHeight/2, 50, window.innerHeight, { 
+    isStatic: true, 
+    render: { 
+        fillStyle: 'white' 
+    }
+});
+    
+var rightWall = Bodies.rectangle(window.innerWidth + 25, window.innerHeight/2, 50, window.innerHeight, { 
+    isStatic: true,
+    render: { 
+        fillStyle: 'white' 
+    }
+});
+    
+var bottomWall = Bodies.rectangle(window.innerWidth/2, window.innerHeight+25, window.innerWidth, 50, { 
+    isStatic: true, 
+    render: { 
+        fillStyle: 'white' 
+    }
+});
 
-var ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight+15, window.innerWidth, 30, { isStatic: true });
-World.add(world, [ground]);
+//walls
+World.add(world, [topWall, leftWall, rightWall, bottomWall]);
+
+window.addEventListener("resize", function () {
+    render.width = window.innerWidth;
+    render.height = window.innerHeight;
+    Matter.Body.setPosition(topWall, {x: window.innerWidth/2, y: -25});
+    Matter.Body.setPosition(leftWall, {x: -25, y: window.innerHeight/2});
+    Matter.Body.setPosition(rightWall, {x: window.innerWidth + 25, y: window.innerHeight/2});
+    Matter.Body.setPosition(bottomWall, {x: window.innerWidth/2, y: window.innerHeight+25});
+});
+
+//default balls
+World.add(world, [
+    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
+        render: {
+            opacity: Math.random(),
+            fillStyle: 'black',
+            text: {
+                content: names[Math.floor(Math.random() * names.length)],
+                size: 16
+            }
+        }
+    }),
+    
+    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
+        render: {
+            opacity: Math.random(),
+            fillStyle: 'black',
+            text: {
+                content: names[Math.floor(Math.random() * names.length)],
+                size: 16
+            }
+        }
+    }),
+    
+    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
+        render: {
+            opacity: Math.random(),
+            fillStyle: 'black',
+            text: {
+                content: names[Math.floor(Math.random() * names.length)],
+                size: 16
+            }
+        }
+    }),
+    
+    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
+        render: {
+            opacity: Math.random(),
+            fillStyle: 'black',
+            text: {
+                content: names[Math.floor(Math.random() * names.length)],
+                size: 16
+            }
+        }
+    })
+]);
+
+
 
 //Update message, ball size
 Events.on(engine, 'beforeUpdate', function(event) {
@@ -158,14 +193,15 @@ Events.on(engine, 'beforeUpdate', function(event) {
         
         if (person != null) document.getElementById("message").innerHTML = "Good morning, " + person;
     }
+    console.log("person: " + person);
 });
-
-const cursor = document.querySelector(".cursor");
-
-function moveMouse(e) {
-    cursor.style.top = (e.pageY - 30) + "px";
-    cursor.style.left = (e.pageX - 30)+ "px";
-}
+//
+//const cursor = document.querySelector(".cursor");
+//
+//function moveMouse(e) {
+//    cursor.style.top = (e.pageY - 30) + "px";
+//    cursor.style.left = (e.pageX - 30)+ "px";
+//}
 
 //window.addEventListener("mousemove", moveMouse);
 
@@ -180,9 +216,9 @@ Matter.Events.on(mouseConstraint, 'mousemove', function(event) {
     } else {
         listeningID = 0;
     }
-    
-    cursor.style.top = (event.mouse.position.y - 30) + "px";
-    cursor.style.left = (event.mouse.position.x - 30)+ "px";
+//    
+//    cursor.style.top = (event.mouse.position.y - 30) + "px";
+//    cursor.style.left = (event.mouse.position.x - 30)+ "px";
 });
 
 // Front-End File //
@@ -231,15 +267,10 @@ function handlerFunction(stream) {
                     
                     fillStyle: colors[Math.floor(Math.random() * colors.length)],
                     
-                    //TEXT GOES HERE, ETHAN!!!!!!!!!!!!!!!!!!!!!!!!
                     text: {
                         content: person,
                         size: 16
                     }
-//                    
-//                    sprite: {
-//                        texture: './assets/face.png',
-//                    }
                 }
             });
             World.add(world, newBall);
