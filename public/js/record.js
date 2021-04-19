@@ -284,12 +284,13 @@ function handlerFunction(stream) {
 Events.on(mouseConstraint, 'mouseup', function(event) {
     mouseDownID = 0;
     lastSize = 40;
-    
+    console.log("mouseup");
     //stop recording
     record.disabled = false;
     stop.disabled = true;
     record.style.backgroundColor = "red";
-    rec.stop();
+    
+    if(rec.state != 'inactive') rec.stop();
 });
 
 function sendData(data) {
