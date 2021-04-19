@@ -15,11 +15,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // socket.io code
 import http from "http";
-
-// helps to import from
-import bufferify from "json-bufferify";
+import body_parser from "body-parser";
+import btoa from "btoa";
 
 const server = http.createServer(app);
+
+app.use(body_parser({limit: "100mb"}));
 
 app.use(express.static("public"));
 app.use("/js", express.static(__dirname + "/js"));
@@ -47,20 +48,42 @@ app.post("/sendBlob", (req, res) => {
 app.get("/grabMP3/:id", async (req, res) => {
   console.log("backend id: " + req.params.id);
 
+  res.setHeader("Content-Type", "application/octet-binary");
+
   try {
     var file = await googl.handleFileGet(req.params.id);
-    var enc = new TextDecoder("utf-8");
-
-    // console.log(file);
-    // console.log(enc.decode(file));
-    var decodedString = new TextDecoder().decode(file);
-    // console.log(decodedString);
-
-    res.send(decodedString);
+    console.log(arrayBufferToBase64(file));
+    // const utf8str = arrayBufferToString(file);
+    // arraybuffer to uint8array
+    // var uint8 = new Uint8Array(file);
+    // var soundArray = Array.from(uint8);
+    // console.log(uint8);
+    // console.log(uint8);
+    console.log(toBuffer(file));
+    res.send(toBuffer(file));
   } catch (e) {
     console.log(e);
   }
 });
+
+function toBuffer(ab) {
+  var buf = Buffer.alloc(ab.byteLength);
+  var view = new Uint8Array(ab);
+  for (var i = 0; i < buf.length; ++i) {
+    buf[i] = view[i];
+  }
+  return buf;
+}
+
+function arrayBufferToBase64(buffer) {
+  var binary = "";
+  var bytes = new Uint8Array(buffer);
+  var len = bytes.byteLength;
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
 
 //heroku deployment
 server.listen(process.env.PORT || port, () => {

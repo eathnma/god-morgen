@@ -1,6 +1,24 @@
 // Front-End File //
 
-// import {response} from "express";
+window.onload = init;
+var context; // Audio context
+var buf; // Audio buffer
+
+var getRecord = document.getElementById("getRecord");
+
+function init() {
+  if (!window.AudioContext) {
+    if (!window.webkitAudioContext) {
+      alert(
+        "Your browser does not support any AudioContext and cannot play back this audio."
+      );
+      return;
+    }
+    window.AudioContext = window.webkitAudioContext;
+  }
+
+  context = new AudioContext();
+}
 
 // grab microphone from mediaDevices library
 navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
@@ -43,80 +61,76 @@ function sendData(data) {
 // grab song-data onclick
 // on-click, grab the id of the ball too.
 // id should match the ID in the Google Drive
-document.getElementById("getRecord").addEventListener("click", function () {
-  // write function here to grab the id of the ball?..
-  var mp3GET = "1oc_9wTWNZDaH_BIpzX_L891wxP2jUnTn";
+getRecord.onclick = function () {
+  var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
   getData(mp3GET);
-});
+};
 
 function getData(id) {
   let request = new XMLHttpRequest();
   request.open("GET", `/grabMP3/${id}`);
 
-  request.send();
-
-  request.responseType = "arrayBuffer";
+  request.responseType = "arraybuffer";
 
   // https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/Sending_and_Receiving_Binary_Data
+  // https://www.generacodice.com/en/articolo/2270907/javascript+readAsArrayBuffer+returns+empty+Array+Buffer
   request.onreadystatechange = function () {
     if (request.readyState === XMLHttpRequest.DONE) {
       var status = request.status;
+
       if (status === 0 || (status >= 200 && status < 400)) {
-        // var arrayBuffer = new Uint8Array();
-        // response.arrayBuffer().then;
-        // var uint8array = new TextEncoder().encode(request.response);
-        // var stringMp3 = uint8arrayToStringMethod(uint8array);
-        console.log(request.response);
-        // playByteArray(uint8array);
-        // playByteArray(request.response);
+        var arrayBuffer = request.response;
+        // var atobArray = window.atob(arrayBuffer);
+        // var uint8 = new Uint8Array(arrayBuffer);
+
+        console.log(arrayBuffer);
+
+        var byteArray = new Uint8Array(arrayBuffer);
+        // console.log(arrayBuffer);
+        var soundArray = Array.from(byteArray);
+
+        // for (var i = 0; i < byteArray.byteLength; i++) {
+        //   // do something with each byte in the array
+        // }
+
+        playByteArray(soundArray);
       } else {
         console.log("bad request - backend");
       }
     }
   };
+  request.send();
 }
 
-// methods from audio buffer
-window.onload = init;
-var context; // Audio context
-var buf; // Audio buffer
-
-function uint8arrayToStringMethod(myUint8Arr) {
-  return String.fromCharCode.apply(null, myUint8Arr);
-}
-
-function readAudioFile(file) {
-  return new Response(file).arrayBuffer();
-}
-
-function init() {
-  if (!window.AudioContext) {
-    if (!window.webkitAudioContext) {
-      alert(
-        "Your browser does not support any AudioContext and cannot play back this audio."
-      );
-      return;
-    }
-    window.AudioContext = window.webkitAudioContext;
+var JsonToArray = function (json) {
+  var str = JSON.stringify(json, null, 0);
+  var ret = new Uint8Array(str.length);
+  for (var i = 0; i < str.length; i++) {
+    ret[i] = str.charCodeAt(i);
   }
+  return ret;
+};
 
-  context = new AudioContext();
-}
-
+// is this a byteArray
 function playByteArray(byteArray) {
   var arrayBuffer = new ArrayBuffer(byteArray.length);
   var bufferView = new Uint8Array(arrayBuffer);
   for (i = 0; i < byteArray.length; i++) {
     bufferView[i] = byteArray[i];
   }
+  // console.log(arrayBuffer);
+  // console.log(bufferView);
 
   context.decodeAudioData(arrayBuffer, function (buffer) {
     buf = buffer;
     play();
   });
+  // var buffer = new Uint8Array(bytes.length);
+  // buffer.set(new Uint8Array(bytes), 0);
+
+  // context.decodeAudioData(buffer.buffer, play);
 }
 
-// Play the loaded file
 function play() {
   // Create a source node from the buffer
   var source = context.createBufferSource();
