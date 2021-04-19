@@ -1,0 +1,99 @@
+@font-face {
+  font-family: maax;
+  src: url(../assets/maax.ttf);
+}
+
+* { 
+    padding: 0; 
+    margin: 0; 
+    
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    
+/*    cursor: none;*/
+    font-family: maax, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background-color: '#171717';
+}
+
+.hide {
+    display: none;
+}
+
+#onboarding {
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+#onboarding > form {
+    width: 40%;
+    margin-top: 240px;
+    font-size: 30px;
+}
+
+input[type=text] {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #acacac;
+    font-size: 48px;
+    padding-bottom: 10px;
+    background: none;
+}
+
+input[type=submit], input[type=button] {
+    background: white;
+    border: 2px solid #cbcbcb;
+    width: 120px;
+    font-size: 24px;
+    border-radius: 100px;
+    height: 60px;
+    margin-top: 20px;
+}
+
+input:focus {
+    outline: none;
+    border-bottom: 2px solid rgb(88, 168, 253);
+}
+
+#myCanvas[resize] { 
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #f8f7f6; 
+    margin: 0 auto;
+    z-index: -99;
+    width: 100%;
+    height: 100%;
+}
+
+.cursor {
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    border: 1px dashed grey;
+    transition: all 0.1s;
+}
+
+#cursor-icon {
+    transform: translate(20px, 20px);
+    fill: grey;
+}
+
+h1 {
+    position: fixed;
+    top: 50px;
+    width: 100%;
+    text-align: center;
+    font-family: maax, sans-serif;
+}
