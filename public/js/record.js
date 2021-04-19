@@ -1,5 +1,3 @@
-//var person = prompt("Please enter your name", "Harry Potter");
-
 var person;
 var overlay = document.getElementById("onboarding");
 
@@ -7,8 +5,6 @@ function closeOverlay(){
     person = document.getElementById("name").value;
     overlay.remove();
 }
-
-
 
 var blue = 'rgb(88, 168, 253)';
 var green = 'rgb(32, 190, 114)';
@@ -84,6 +80,8 @@ var listeningID = 0;
 var counter = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
+var balls = [];
+const maxTime = 120000;
 
 
 var topWall = Bodies.rectangle(window.innerWidth/2, -25, window.innerWidth, 50, { 
@@ -126,57 +124,61 @@ window.addEventListener("resize", function () {
     Matter.Body.setPosition(bottomWall, {x: window.innerWidth/2, y: window.innerHeight+25});
 });
 
-//default balls
-World.add(world, [
-    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
-        render: {
-            opacity: Math.random(),
-            fillStyle: 'black',
-            text: {
-                content: names[Math.floor(Math.random() * names.length)],
-                size: 16
+class Ball {
+    constructor(timeStamp, name, x, y, size, colour) {
+        this.timeStamp = timeStamp;
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.colour = colour;
+        this.body = Bodies.circle(this.x, this.y, this.size, {
+            render: {
+                fillStyle: this.colour,
+                lineWidth: 1,
+                text: {
+                    content: this.name,
+                    size: 16
+                }
             }
-        }
-    }),
+        });
+        
+        World.add(world, [this.body]);
+    }
     
-    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
-        render: {
-            opacity: Math.random(),
-            fillStyle: 'black',
-            text: {
-                content: names[Math.floor(Math.random() * names.length)],
-                size: 16
-            }
-        }
-    }),
+    setOpacity(val){
+        this.body.render.opacity = val;
+    }
     
-    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
-        render: {
-            opacity: Math.random(),
-            fillStyle: 'black',
-            text: {
-                content: names[Math.floor(Math.random() * names.length)],
-                size: 16
-            }
-        }
-    }),
+    timeStamp(){
+        return this.timeStamp;
+    }
     
-    Bodies.circle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), {
-        render: {
-            opacity: Math.random(),
-            fillStyle: 'black',
-            text: {
-                content: names[Math.floor(Math.random() * names.length)],
-                size: 16
-            }
-        }
-    })
-]);
+    remove(){
+        Matter.Composite(remove(world, this.body));
+    }
+}
 
+window.onload = function(){
+    for (var i = 0; i < 4; i++) {
+        balls.push(new Ball(Date.now(), names[Math.floor(Math.random() * names.length)], Math.random() * window.innerWidth, Math.random() * window.innerHeight, 60 + (Math.random() * 150), 'black'));
+    }
+}
 
+function changeOpacity(ball){
+    let originalTime = ball.timeStamp;
+    let timeDiff = Date.now() - originalTime;
+    let opacity = (1/maxTime) * timeDiff;
+    ball.setOpacity(1-opacity);
+    console.log(1-opacity);
+    if ((1-opacity) < 0 || (1-opacity)>1) {
+        ball.remove();
+    }
+}
 
 //Update message, ball size
 Events.on(engine, 'beforeUpdate', function(event) {
+    balls.forEach(changeOpacity);
     
     lastSize *= inflateFactor;
     
@@ -265,7 +267,7 @@ function handlerFunction(stream) {
             newBall = Bodies.circle(event.mouse.position.x, event.mouse.position.y, 60, {
                 render: {
                     
-                    fillStyle: colors[Math.floor(Math.random() * colors.length)],
+                    fillStyle: 'black',
                     
                     text: {
                         content: person,
@@ -274,6 +276,8 @@ function handlerFunction(stream) {
                 }
             });
             World.add(world, newBall);
+//            newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60, 'white')
+//            balls.push(newBall);
         }
     });
 }
