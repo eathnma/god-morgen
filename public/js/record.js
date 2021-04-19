@@ -81,7 +81,7 @@ var counter = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
 var balls = [];
-const maxTime = 20000;
+const maxTime = 15000;
 
 
 var topWall = Bodies.rectangle(window.innerWidth/2, -25, window.innerWidth, 50, { 
