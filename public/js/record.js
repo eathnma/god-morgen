@@ -182,7 +182,7 @@ Events.on(engine, 'beforeUpdate', function(event) {
     
     lastSize *= inflateFactor;
     
-    if (mouseDownID == 1 && lastSize < maxSize && !foundBall)    {
+    if (mouseDownID == 1 && lastSize < maxSize && (!foundBall || foundBall == newBall))    {
         Matter.Body.scale(newBall, inflateFactor, inflateFactor);
         document.getElementById("message").innerHTML = "Recording...";
     } else if (listeningID == 1){
@@ -196,15 +196,6 @@ Events.on(engine, 'beforeUpdate', function(event) {
     }
     console.log("person: " + person);
 });
-//
-//const cursor = document.querySelector(".cursor");
-//
-//function moveMouse(e) {
-//    cursor.style.top = (e.pageY - 30) + "px";
-//    cursor.style.left = (e.pageX - 30)+ "px";
-//}
-
-//window.addEventListener("mousemove", moveMouse);
 
 //Check hover on balls
 Matter.Events.on(mouseConstraint, 'mousemove', function(event) {
@@ -212,14 +203,11 @@ Matter.Events.on(mouseConstraint, 'mousemove', function(event) {
     var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
     foundBall = foundPhysics[0];
     
-    if (foundBall && mouseDownID == 1) {
+    if (foundBall && foundBall != newBall && mouseDownID == 1) {
         listeningID = 1;
     } else {
         listeningID = 0;
     }
-//    
-//    cursor.style.top = (event.mouse.position.y - 30) + "px";
-//    cursor.style.left = (event.mouse.position.x - 30)+ "px";
 });
 
 // Front-End File //
