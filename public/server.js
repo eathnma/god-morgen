@@ -3,7 +3,7 @@ var googl = new Googl();
 
 // run Backend Node Server
 import path, {dirname} from "path";
-const port = 1500;
+const port = 1501;
 
 import express from "express";
 const app = express();
@@ -45,7 +45,8 @@ app.post("/sendBlob", (req, res) => {
 });
 
 //grab file id's from the drive
-googl.handleFileGetList(googl.listFiles);
+// googl.
+// handleFileGetList(googl.listFiles);
 
 // grab mp3 from backend
 app.get("/grabMP3/:id", async (req, res) => {
@@ -88,7 +89,6 @@ function arrayBufferToBase64(buffer) {
   return btoa(binary);
 }
 
-//heroku deployment
 server.listen(process.env.PORT || port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
