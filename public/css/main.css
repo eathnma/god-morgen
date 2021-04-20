@@ -24,6 +24,18 @@ html, body {
     display: none;
 }
 
+#date {
+    position: fixed;
+    top: 50px;
+    left: 50px;
+}
+
+#time {
+    position: fixed;
+    top: 50px;
+    right: 50px;
+}
+
 #onboarding {
     background-color: rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);

@@ -6,6 +6,11 @@ function closeOverlay() {
   overlay.remove();
 }
 
+var d = new Date();
+var time = d.getHours();
+document.getElementById("date").innerHTML = d.toLocaleDateString();
+document.getElementById("time").innerHTML = d.toLocaleTimeString();
+
 var names = [
   "Ashley",
   "Brendan",
@@ -263,7 +268,18 @@ Events.on(engine, "beforeUpdate", function (event) {
     counter = 0;
 
     if (person != null)
-      document.getElementById("message").innerHTML = "Good morning, " + person;
+        if(time > 18) {
+            document.getElementById("message").innerHTML = "Good evening, " + person;
+        } else if (time > 12) {
+            document.getElementById("message").innerHTML = "Good afternoon, " + person;
+        } else if (time > 5) {
+            document.getElementById("message").innerHTML = "Good morning, " + person;
+        } else if (time >= 0) {
+            document.getElementById("message").innerHTML = "Good night, " + person;
+        } else {
+            document.getElementById("message").innerHTML = "Hello, " + person;
+        }
+      
   }
 });
 
