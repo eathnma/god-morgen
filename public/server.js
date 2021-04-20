@@ -44,6 +44,9 @@ app.post("/sendBlob", (req, res) => {
   });
 });
 
+//grab file id's from the drive
+googl.handleFileGetList(googl.listFiles);
+
 // grab mp3 from backend
 app.get("/grabMP3/:id", async (req, res) => {
   console.log("backend id: " + req.params.id);
@@ -52,14 +55,14 @@ app.get("/grabMP3/:id", async (req, res) => {
 
   try {
     var file = await googl.handleFileGet(req.params.id);
-    console.log(arrayBufferToBase64(file));
+    // console.log(arrayBufferToBase64(file));
     // const utf8str = arrayBufferToString(file);
     // arraybuffer to uint8array
     // var uint8 = new Uint8Array(file);
     // var soundArray = Array.from(uint8);
     // console.log(uint8);
     // console.log(uint8);
-    console.log(toBuffer(file));
+    // console.log(toBuffer(file));
     res.send(toBuffer(file));
   } catch (e) {
     console.log(e);

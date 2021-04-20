@@ -41,6 +41,20 @@ var names = [
   "Zoe",
 ];
 
+var fileIDs = [
+  "19160KI4m4b778gBssHsrPkJK36K1ZhHx",
+  "1uK6pHfZPc89QpFLM8IernI0d2BaGFP7h",
+  "13Wmlah6tygrjrTUU-109VTB6xi584q1o",
+  "1kiwvE5f2e0aoPwYPQyZU9FzdhFFS44DS",
+  "1qQ7w61IaSddSs_0m1BGntVGAmzadKAxu",
+  "1hQD3-Yjo7r55Nh9TN874j1JF6tJ06-99",
+  "1SeNcK0poXQEoM8i1umDBFcx_nyNCig8a",
+  "1p1aW6GNhz-DfwigcHvwFIVBvrmJtEdGt",
+  "1N_M3t-pyo3cRT8BlJ2RCMUINKrDFz2nN",
+  "1J2FomX8_Rhm8Vf62YAHYQmuimg5X7qg0",
+  "1jVRrDyDuqLs-1Ey1aCHwPikOkDnx_ikb",
+];
+
 var Engine = Matter.Engine,
   Render = Matter.Render,
   Runner = Matter.Runner,
@@ -182,7 +196,7 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size, colour) {
+  constructor(timeStamp, name, x, y, size, colour, id) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
@@ -199,6 +213,7 @@ class Ball {
         },
       },
     });
+    this.id = id;
 
     World.add(world, [this.body]);
   }
@@ -215,22 +230,6 @@ class Ball {
     Matter.Composite.remove(world, this.body);
   }
 }
-
-window.onload = function () {
-  console.log("balls show");
-  for (var i = 0; i < 4; i++) {
-    balls.push(
-      new Ball(
-        Date.now(),
-        names[Math.floor(Math.random() * names.length)],
-        Math.random() * window.innerWidth,
-        Math.random() * window.innerHeight,
-        60 + Math.random() * 150,
-        "black"
-      )
-    );
-  }
-};
 
 function changeOpacity(ball) {
   let originalTime = ball.timeStamp;
@@ -249,8 +248,6 @@ Events.on(engine, "beforeUpdate", function (event) {
 
   lastSize *= inflateFactor;
 
-  //
-  //
   if (mouseDownID == 1 && lastSize < maxSize && !foundBall) {
     Matter.Body.scale(newBall, inflateFactor, inflateFactor);
     document.getElementById("message").innerHTML = "Recording...";
@@ -272,15 +269,6 @@ Events.on(engine, "beforeUpdate", function (event) {
   }
   console.log("person: " + person);
 });
-//
-//const cursor = document.querySelector(".cursor");
-//
-//function moveMouse(e) {
-//    cursor.style.top = (e.pageY - 30) + "px";
-//    cursor.style.left = (e.pageX - 30)+ "px";
-//}
-
-//window.addEventListener("mousemove", moveMouse);
 
 //Check hover on balls
 Matter.Events.on(mouseConstraint, "mousemove", function (event) {
@@ -306,6 +294,21 @@ var buf; // Audio buffer
 var getRecord = document.getElementById("getRecord");
 
 function init() {
+  // create balls
+  for (var i = 0; i < 4; i++) {
+    balls.push(
+      new Ball(
+        Date.now(),
+        names[Math.floor(Math.random() * names.length)],
+        Math.random() * window.innerWidth,
+        Math.random() * window.innerHeight,
+        60 + Math.random() * 150,
+        "black"
+        // googlechromeid
+      )
+    );
+  }
+
   if (!window.AudioContext) {
     if (!window.webkitAudioContext) {
       alert(

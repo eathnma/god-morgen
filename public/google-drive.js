@@ -108,7 +108,14 @@ export class Googl {
     return responseLayer;
   }
 
-  async doSomething(callback) {}
+  handleFileGetList(method) {
+    var that = this;
+    fs.readFile("credentials.json", (err, content) => {
+      if (err) return console.log("Error loading client secret file:", err);
+      //Authorize a client with credentials, then call the Google Drive API.
+      that.authorize(JSON.parse(content), method);
+    });
+  }
 
   handleFile(name, blob, method) {
     var that = this;
@@ -139,37 +146,40 @@ export class Googl {
     });
   }
 
-  listFiles(auth) {
+  listFiles(auth, useless1, useless2) {
     const drive = google.drive({version: "v3", auth});
-    getList(drive, "");
-  }
 
-  getList(drive, pageToken) {
-    drive.files.list(
-      {
-        corpora: "user",
-        pageSize: 10,
-        //q: "name='elvis233424234'",
-        pageToken: pageToken ? pageToken : "",
-        fields: "nextPageToken, files(*)",
-      },
-      (err, res) => {
-        if (err) return console.log("The API returned an error: " + err);
-        const files = res.data.files;
-        if (files.length) {
-          console.log("Files:");
-          processList(files);
-          if (res.data.nextPageToken) {
-            getList(drive, res.data.nextPageToken);
+    function getList(drive, pageToken) {
+      drive.files.list(
+        {
+          // corpora: "user",
+          // pageSize: 10,
+          // q: "name='hello'",
+          // pageToken: pageToken ? pageToken : "",
+          // fields: "nextPageToken, files(*)",
+        },
+        (err, res) => {
+          if (err) return console.log("The API returned an error: " + err);
+          const files = res.data.files;
+          if (files.length) {
+            console.log("Files:");
+            // processList(files);
+            console.log(files);
+            if (res.data.nextPageToken) {
+              getList(drive, res.data.nextPageToken);
+            }
+
+            // files.map((file) => {
+            //     console.log(`${file.name} (${file.id})`);
+            // });
+          } else {
+            console.log("No files found.");
           }
-          // files.map((file) => {
-          //     console.log(`${file.name} (${file.id})`);
-          // });
-        } else {
-          console.log("No files found.");
         }
-      }
-    );
+      );
+    }
+
+    getList(drive, "");
   }
 
   uploadFile(auth, name, blob) {
