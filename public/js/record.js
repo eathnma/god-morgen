@@ -160,9 +160,6 @@ var bottomWall = Bodies.rectangle(
   }
 );
 
-// Message Start & Stop
-var messageStart = 0;
-
 //walls
 World.add(world, [topWall, leftWall, rightWall, bottomWall]);
 
@@ -214,6 +211,14 @@ class Ball {
   remove() {
     Matter.Composite.remove(world, this.body);
   }
+    
+  inflate() {
+    Matter.Body.scale(this.body, inflateFactor, inflateFactor);
+  }
+    
+  body() {
+      return this.body;
+  }
 }
 
 window.onload = function () {
@@ -237,7 +242,6 @@ function changeOpacity(ball) {
   let timeDiff = Date.now() - originalTime;
   let opacity = (1 / maxTime) * timeDiff;
   ball.setOpacity(1 - opacity);
-  console.log(1 - opacity);
   if (1 - opacity < 0 || 1 - opacity > 1) {
     ball.remove();
   }
@@ -249,38 +253,20 @@ Events.on(engine, "beforeUpdate", function (event) {
 
   lastSize *= inflateFactor;
 
-  //
-  //
   if (mouseDownID == 1 && lastSize < maxSize && !foundBall) {
-    Matter.Body.scale(newBall, inflateFactor, inflateFactor);
+    newBall.inflate();
     document.getElementById("message").innerHTML = "Recording...";
   } else if (listeningID == 1) {
     counter += 1;
     Matter.Body.scale(foundBall, deflateFactor, deflateFactor);
     document.getElementById("message").innerHTML = "Listening...";
-
-    if (messageStart === 0) {
-      var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
-      getData(mp3GET);
-      messageStart = 1;
-    }
   } else if (listeningID == 0) {
     counter = 0;
 
     if (person != null)
       document.getElementById("message").innerHTML = "Good morning, " + person;
   }
-  console.log("person: " + person);
 });
-//
-//const cursor = document.querySelector(".cursor");
-//
-//function moveMouse(e) {
-//    cursor.style.top = (e.pageY - 30) + "px";
-//    cursor.style.left = (e.pageX - 30)+ "px";
-//}
-
-//window.addEventListener("mousemove", moveMouse);
 
 //Check hover on balls
 Matter.Events.on(mouseConstraint, "mousemove", function (event) {
@@ -288,14 +274,11 @@ Matter.Events.on(mouseConstraint, "mousemove", function (event) {
   var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
   foundBall = foundPhysics[0];
 
-  if (foundBall && foundBall != newBall && mouseDownID == 1) {
+  if (foundBall && foundBall != newBall.body && mouseDownID == 1) {
     listeningID = 1;
   } else {
     listeningID = 0;
   }
-  //
-  //    cursor.style.top = (event.mouse.position.y - 30) + "px";
-  //    cursor.style.left = (event.mouse.position.x - 30)+ "px";
 });
 
 // Front-End File //
@@ -356,34 +339,23 @@ function handlerFunction(stream) {
         }
       };
 
-      //create ball
-      newBall = Bodies.circle(
-        event.mouse.position.x,
-        event.mouse.position.y,
-        60,
-        {
-          render: {
-            fillStyle: "black",
-
-            text: {
-              content: person,
-              size: 16,
-            },
-          },
-        }
-      );
-      World.add(world, newBall);
-      //            newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60, 'white')
-      //            balls.push(newBall);
+        newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60, 'black')
+        balls.push(newBall);
+    } else if(foundBall) {
+          var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
+          getData(mp3GET);
     }
   });
 }
 
 Events.on(mouseConstraint, "mouseup", function (event) {
-  messageStart = 0;
   mouseDownID = 0;
   lastSize = 40;
-  console.log("mouseup");
+    
+  if (listeningID == 1) {
+      Matter.Composite.remove(world, foundBall);
+      console.log("mouseUP");
+  }
   //stop recording
   record.disabled = false;
   stop.disabled = true;
@@ -433,7 +405,7 @@ function getData(id) {
         // for (var i = 0; i < byteArray.byteLength; i++) {
         //   // do something with each byte in the array
         // }
-
+        
         playByteArray(soundArray);
       } else {
         console.log("bad request - backend");
