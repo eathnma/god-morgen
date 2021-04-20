@@ -54,12 +54,12 @@ var fileIDs = [
   "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
 ];
 
-var blue = 'rgb(88, 168, 253)';
-var green = 'rgb(32, 190, 114)';
-var indigo = 'rgb(90, 96, 254)';
-var mustard = 'rgb(248, 188, 72)';
-var orange = 'rgb(248, 84, 48)';
-var plum = 'rgb(143, 23, 97)';
+var blue = "rgb(88, 168, 253)";
+var green = "rgb(32, 190, 114)";
+var indigo = "rgb(90, 96, 254)";
+var mustard = "rgb(248, 188, 72)";
+var orange = "rgb(248, 84, 48)";
+var plum = "rgb(143, 23, 97)";
 
 var colors = [blue, green, indigo, mustard, orange, plum];
 
@@ -121,7 +121,7 @@ var newBall;
 var foundBall;
 var mouseDownID = 0;
 var lastSize = 40; //size of most recently added ball
-const maxSize = 300;
+const maxSize = 120;
 const minSize = 60;
 var listeningID = 0;
 var counter = 0;
@@ -201,7 +201,7 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size, colour) {
+  constructor(timeStamp, name, x, y, size, id) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
@@ -233,13 +233,13 @@ class Ball {
   remove() {
     Matter.Composite.remove(world, this.body);
   }
-    
+
   inflate() {
     Matter.Body.scale(this.body, inflateFactor, inflateFactor);
   }
-    
+
   body() {
-      return this.body;
+    return this.body;
   }
 }
 
@@ -270,18 +270,20 @@ Events.on(engine, "beforeUpdate", function (event) {
     counter = 0;
 
     if (person != null)
-        if(time > 18) {
-            document.getElementById("message").innerHTML = "Good evening, " + person;
-        } else if (time > 12) {
-            document.getElementById("message").innerHTML = "Good afternoon, " + person;
-        } else if (time > 5) {
-            document.getElementById("message").innerHTML = "Good morning, " + person;
-        } else if (time >= 0) {
-            document.getElementById("message").innerHTML = "Good night, " + person;
-        } else {
-            document.getElementById("message").innerHTML = "Hello, " + person;
-        }
-      
+      if (time > 18) {
+        document.getElementById("message").innerHTML =
+          "Good evening, " + person;
+      } else if (time > 12) {
+        document.getElementById("message").innerHTML =
+          "Good afternoon, " + person;
+      } else if (time > 5) {
+        document.getElementById("message").innerHTML =
+          "Good morning, " + person;
+      } else if (time >= 0) {
+        document.getElementById("message").innerHTML = "Good night, " + person;
+      } else {
+        document.getElementById("message").innerHTML = "Hello, " + person;
+      }
   }
 });
 
@@ -307,16 +309,16 @@ var getRecord = document.getElementById("getRecord");
 
 function init() {
   // create balls
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 6; i++) {
     balls.push(
       new Ball(
+        // Date.now() + Math.random() * 20000,
         Date.now(),
         names[Math.floor(Math.random() * names.length)],
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
-        60 + Math.random() * 150,
-        "black"
-        // googlechromeid
+        60 + Math.random() * maxSize
+        // fileIDs[Math.floor(Math.random() * fileIDs.length)]
       )
     );
   }
@@ -371,11 +373,17 @@ function handlerFunction(stream) {
         }
       };
 
-        newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60)
-        balls.push(newBall);
-    } else if(foundBall) {
-          var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
-          getData(mp3GET);
+      newBall = new Ball(
+        Date.now(),
+        person,
+        event.mouse.position.x,
+        event.mouse.position.y,
+        60
+      );
+      balls.push(newBall);
+    } else if (foundBall) {
+      var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
+      getData(mp3GET);
     }
   });
 }
@@ -383,10 +391,10 @@ function handlerFunction(stream) {
 Events.on(mouseConstraint, "mouseup", function (event) {
   mouseDownID = 0;
   lastSize = 40;
-    
+
   if (listeningID == 1) {
-      Matter.Composite.remove(world, foundBall);
-      console.log("mouseUP");
+    Matter.Composite.remove(world, foundBall);
+    console.log("mouseUP");
   }
   //stop recording
   record.disabled = false;
@@ -437,7 +445,7 @@ function getData(id) {
         // for (var i = 0; i < byteArray.byteLength; i++) {
         //   // do something with each byte in the array
         // }
-        
+
         playByteArray(soundArray);
       } else {
         console.log("bad request - backend");
