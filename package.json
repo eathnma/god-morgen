@@ -2,9 +2,11 @@
   "name": "god-morgen",
   "version": "1.0.0",
   "description": "God-Morgen Carman",
-  "main": "index.js",
+  "main": "public/server.js",
   "type": "module",
   "scripts": {
+   "start": "node public/server.js",
+   "devStart": "nodemon public/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
