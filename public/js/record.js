@@ -305,30 +305,6 @@ console.log(lastSize);
   }
 });
 
-//Check hover on balls
-//Matter.Events.on(mouseConstraint, "mousemove", function (event) {
-//  //  var bodies = Matter.Composite.allBodies(world);
-//  //  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
-//  //  foundBall = foundPhysics[0];
-//  //
-//  for (var i = 0; i < balls.length; i++) {
-//    let ball = balls[i];
-//    if (ball.checkHit(event.mouse.position)) {
-//      foundBall = ball;
-//    } else {
-//      foundBall = null;
-//    }
-//  }
-//
-//  if (foundBall && mouseDownID == 1 && newBall != null) {
-//    if (foundBall != newBall) {
-//      listeningID = 1;
-//    } else {
-//      listeningID = 0;
-//    }
-//  }
-//});
-
 // Front-End File //
 window.onload = init;
 var context; // Audio context
@@ -436,13 +412,11 @@ function handlerFunction(stream) {
 
 Events.on(mouseConstraint, "mouseup", function (event) {
     mouseDown = false;
-    selectedBall = null;
-    
   mouseDownID = 0;
   lastSize = 40;
 
-  if (listeningID == 1) {
-    Matter.Composite.remove(world, foundBall);
+  if (selectedBall != null) {
+    selectedBall.remove();
     console.log("mouseUP");
   }
   //stop recording
