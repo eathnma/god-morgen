@@ -201,7 +201,7 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size, id) {
+  constructor(timeStamp, name, x, y, size) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
@@ -217,9 +217,21 @@ class Ball {
         },
       },
     });
-    this.id = id;
+//    this.id = id;
 
     World.add(world, [this.body]);
+  }
+    
+  checkHit(point){
+    var hit;
+    if(Matter.Query.point(this.body, point)) {
+        hit = true;
+        console.log("true");
+    } else {
+        hit = false;
+        console.log("false");
+    }
+      return hit;
   }
 
   setOpacity(val) {
@@ -237,6 +249,11 @@ class Ball {
   inflate() {
     Matter.Body.scale(this.body, inflateFactor, inflateFactor);
   }
+    
+  deflate() {
+    Matter.Body.scale(this.body, deflateFactor, deflateFactor);
+  }
+
 
   body() {
     return this.body;
@@ -264,7 +281,7 @@ Events.on(engine, "beforeUpdate", function (event) {
     document.getElementById("message").innerHTML = "Recording...";
   } else if (listeningID == 1) {
     counter += 1;
-    Matter.Body.scale(foundBall, deflateFactor, deflateFactor);
+    foundBall.deflate();
     document.getElementById("message").innerHTML = "Listening...";
   } else if (listeningID == 0) {
     counter = 0;
@@ -289,15 +306,25 @@ Events.on(engine, "beforeUpdate", function (event) {
 
 //Check hover on balls
 Matter.Events.on(mouseConstraint, "mousemove", function (event) {
-  var bodies = Matter.Composite.allBodies(world);
-  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
-  foundBall = foundPhysics[0];
-
-  if (foundBall && foundBall != newBall.body && mouseDownID == 1) {
-    listeningID = 1;
-  } else {
-    listeningID = 0;
+//  var bodies = Matter.Composite.allBodies(world);
+//  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
+//  foundBall = foundPhysics[0];
+//  
+  for (var i = 0; i < balls.length; i++) {
+      let ball = balls[i];
+      if(ball.checkHit(event.mouse.position)){
+          foundBall = ball;
+      }
   }
+
+  if (foundBall && mouseDownID == 1 && newBall != null) {
+        if (foundBall != newBall){
+           listeningID = 1; }
+        else {
+            listeningID = 0;
+        } 
+    } 
+
 });
 
 // Front-End File //
@@ -351,6 +378,7 @@ function handlerFunction(stream) {
   Events.on(mouseConstraint, "mousedown", function (event) {
     mouseDownID = 1;
 
+      console.log("mousedown");
     //If mouse is pressed and not over a ball, add a new ball and record audio
     if (!foundBall) {
       //record audio
