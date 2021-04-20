@@ -6,14 +6,11 @@ function closeOverlay() {
   overlay.remove();
 }
 
-var blue = "rgb(88, 168, 253)";
-var green = "rgb(32, 190, 114)";
-var indigo = "rgb(90, 96, 254)";
-var mustard = "rgb(248, 188, 72)";
-var orange = "rgb(248, 84, 48)";
-var plum = "rgb(143, 23, 97)";
+var d = new Date();
+var time = d.getHours();
+document.getElementById("date").innerHTML = d.toLocaleDateString();
+document.getElementById("time").innerHTML = d.toLocaleTimeString();
 
-var colors = [blue, green, indigo, mustard, orange, plum];
 var names = [
   "Ashley",
   "Brendan",
@@ -56,6 +53,15 @@ var fileIDs = [
   "1jVRrDyDuqLs-1Ey1aCHwPikOkDnx_ikb",
   "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
 ];
+
+var blue = 'rgb(88, 168, 253)';
+var green = 'rgb(32, 190, 114)';
+var indigo = 'rgb(90, 96, 254)';
+var mustard = 'rgb(248, 188, 72)';
+var orange = 'rgb(248, 84, 48)';
+var plum = 'rgb(143, 23, 97)';
+
+var colors = [blue, green, indigo, mustard, orange, plum];
 
 var Engine = Matter.Engine,
   Render = Matter.Render,
@@ -176,9 +182,6 @@ var bottomWall = Bodies.rectangle(
   }
 );
 
-// Message Start & Stop
-var messageStart = 0;
-
 //walls
 World.add(world, [topWall, leftWall, rightWall, bottomWall]);
 
@@ -198,16 +201,15 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size, colour, id) {
+  constructor(timeStamp, name, x, y, size, colour) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
     this.y = y;
     this.size = size;
-    this.colour = colour;
     this.body = Bodies.circle(this.x, this.y, this.size, {
       render: {
-        fillStyle: this.colour,
+        fillStyle: colors[Math.floor(Math.random() * colors.length)],
         lineWidth: 1,
         text: {
           content: this.name,
@@ -231,6 +233,14 @@ class Ball {
   remove() {
     Matter.Composite.remove(world, this.body);
   }
+    
+  inflate() {
+    Matter.Body.scale(this.body, inflateFactor, inflateFactor);
+  }
+    
+  body() {
+      return this.body;
+  }
 }
 
 function changeOpacity(ball) {
@@ -238,7 +248,6 @@ function changeOpacity(ball) {
   let timeDiff = Date.now() - originalTime;
   let opacity = (1 / maxTime) * timeDiff;
   ball.setOpacity(1 - opacity);
-  console.log(1 - opacity);
   if (1 - opacity < 0 || 1 - opacity > 1) {
     ball.remove();
   }
@@ -251,25 +260,29 @@ Events.on(engine, "beforeUpdate", function (event) {
   lastSize *= inflateFactor;
 
   if (mouseDownID == 1 && lastSize < maxSize && !foundBall) {
-    Matter.Body.scale(newBall, inflateFactor, inflateFactor);
+    newBall.inflate();
     document.getElementById("message").innerHTML = "Recording...";
   } else if (listeningID == 1) {
     counter += 1;
     Matter.Body.scale(foundBall, deflateFactor, deflateFactor);
     document.getElementById("message").innerHTML = "Listening...";
-
-    if (messageStart === 0) {
-      var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
-      getData(mp3GET);
-      messageStart = 1;
-    }
   } else if (listeningID == 0) {
     counter = 0;
 
     if (person != null)
-      document.getElementById("message").innerHTML = "Good morning, " + person;
+        if(time > 18) {
+            document.getElementById("message").innerHTML = "Good evening, " + person;
+        } else if (time > 12) {
+            document.getElementById("message").innerHTML = "Good afternoon, " + person;
+        } else if (time > 5) {
+            document.getElementById("message").innerHTML = "Good morning, " + person;
+        } else if (time >= 0) {
+            document.getElementById("message").innerHTML = "Good night, " + person;
+        } else {
+            document.getElementById("message").innerHTML = "Hello, " + person;
+        }
+      
   }
-  console.log("person: " + person);
 });
 
 //Check hover on balls
@@ -278,14 +291,11 @@ Matter.Events.on(mouseConstraint, "mousemove", function (event) {
   var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
   foundBall = foundPhysics[0];
 
-  if (foundBall && foundBall != newBall && mouseDownID == 1) {
+  if (foundBall && foundBall != newBall.body && mouseDownID == 1) {
     listeningID = 1;
   } else {
     listeningID = 0;
   }
-  //
-  //    cursor.style.top = (event.mouse.position.y - 30) + "px";
-  //    cursor.style.left = (event.mouse.position.x - 30)+ "px";
 });
 
 // Front-End File //
@@ -361,34 +371,23 @@ function handlerFunction(stream) {
         }
       };
 
-      //create ball
-      newBall = Bodies.circle(
-        event.mouse.position.x,
-        event.mouse.position.y,
-        60,
-        {
-          render: {
-            fillStyle: "black",
-
-            text: {
-              content: person,
-              size: 16,
-            },
-          },
-        }
-      );
-      World.add(world, newBall);
-      //            newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60, 'white')
-      //            balls.push(newBall);
+        newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60)
+        balls.push(newBall);
+    } else if(foundBall) {
+          var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
+          getData(mp3GET);
     }
   });
 }
 
 Events.on(mouseConstraint, "mouseup", function (event) {
-  messageStart = 0;
   mouseDownID = 0;
   lastSize = 40;
-  console.log("mouseup");
+    
+  if (listeningID == 1) {
+      Matter.Composite.remove(world, foundBall);
+      console.log("mouseUP");
+  }
   //stop recording
   record.disabled = false;
   stop.disabled = true;
@@ -438,7 +437,7 @@ function getData(id) {
         // for (var i = 0; i < byteArray.byteLength; i++) {
         //   // do something with each byte in the array
         // }
-
+        
         playByteArray(soundArray);
       } else {
         console.log("bad request - backend");
