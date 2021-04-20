@@ -63,6 +63,8 @@ var plum = "rgb(143, 23, 97)";
 
 var colors = [blue, green, indigo, mustard, orange, plum];
 
+var bodies = [];
+
 var Engine = Matter.Engine,
   Render = Matter.Render,
   Runner = Matter.Runner,
@@ -124,7 +126,6 @@ var lastSize = 40; //size of most recently added ball
 const maxSize = 120;
 const minSize = 60;
 var listeningID = 0;
-var counter = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
 var balls = [];
@@ -221,17 +222,15 @@ class Ball {
 
     World.add(world, [this.body]);
   }
-    
-  checkHit(point){
-    var hit;
-    if(Matter.Query.point(this.body, point)) {
-        hit = true;
-        console.log("true");
+
+  checkHit(point) {
+    var bodies = Matter.Composite.allBodies(world);
+    var hitBodies = Matter.Query.point(bodies, point);
+    if (hitBodies[0] == this.body) {
+      return true;
     } else {
-        hit = false;
-        console.log("false");
+      return false;
     }
-      return hit;
   }
 
   setOpacity(val) {
@@ -249,36 +248,12 @@ class Ball {
   inflate() {
     Matter.Body.scale(this.body, inflateFactor, inflateFactor);
   }
-    
+
   deflate() {
     Matter.Body.scale(this.body, deflateFactor, deflateFactor);
   }
 
-  record(stream){
-    rec = new MediaRecorder(stream);
-    let blob;
-    let urlMP3;
-      
-    //record audio
-    record.disabled = true;
-    record.style.backgroundColor = "blue";
-    stopRecord.disabled = false;
-    audioChunks = [];
-    rec.start();
-
-    //send data
-    rec.ondataavailable = (e) => {
-    audioChunks.push(e.data);
-
-        if (rec.state == "inactive") {
-          blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
-          recordedAudio.src = URL.createObjectURL(blob);
-          recordedAudio.controls = true;
-          recordedAudio.autoplay = true;
-          sendData(blob);
-        }
-    };
-  }
+  record(stream) {}
 
   body() {
     return this.body;
@@ -305,12 +280,9 @@ Events.on(engine, "beforeUpdate", function (event) {
     newBall.inflate();
     document.getElementById("message").innerHTML = "Recording...";
   } else if (listeningID == 1) {
-    counter += 1;
     foundBall.deflate();
     document.getElementById("message").innerHTML = "Listening...";
   } else if (listeningID == 0) {
-    counter = 0;
-
     if (person != null)
       if (time > 18) {
         document.getElementById("message").innerHTML =
@@ -331,27 +303,26 @@ Events.on(engine, "beforeUpdate", function (event) {
 
 //Check hover on balls
 Matter.Events.on(mouseConstraint, "mousemove", function (event) {
-//  var bodies = Matter.Composite.allBodies(world);
-//  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
-//  foundBall = foundPhysics[0];
-//  
+  //  var bodies = Matter.Composite.allBodies(world);
+  //  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
+  //  foundBall = foundPhysics[0];
+  //
   for (var i = 0; i < balls.length; i++) {
-      let ball = balls[i];
-      if(ball.checkHit(event.mouse.position)){
-          foundBall = ball;
-      } else {
-          foundBall = null;
-      }
+    let ball = balls[i];
+    if (ball.checkHit(event.mouse.position)) {
+      foundBall = ball;
+    } else {
+      foundBall = null;
+    }
   }
 
   if (foundBall && mouseDownID == 1 && newBall != null) {
-        if (foundBall != newBall){
-           listeningID = 1; }
-        else {
-            listeningID = 0;
-        } 
-    } 
-
+    if (foundBall != newBall) {
+      listeningID = 1;
+    } else {
+      listeningID = 0;
+    }
+  }
 });
 
 // Front-End File //
@@ -372,7 +343,7 @@ function init() {
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
         60 + Math.random() * maxSize,
-         fileIDs[Math.floor(Math.random() * fileIDs.length)]
+        fileIDs[Math.floor(Math.random() * fileIDs.length)]
       )
     );
   }
@@ -398,34 +369,62 @@ navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
 // converting a blob url and sending it to a file
 // https://stackoverflow.com/questions/60431835/how-to-convert-a-blob-url-to-a-audio-file-and-save-it-to-the-server
 function handlerFunction(stream) {
-
+  rec = new MediaRecorder(stream);
+  let blob;
+  let urlMP3;
 
   Events.on(mouseConstraint, "mousedown", function (event) {
-    
+    var hitBall;
+    var selectedBall;
+
     for (var i = 0; i < balls.length; i++) {
       let ball = balls[i];
-      if(ball.checkHit(event.mouse.position)){
-        if(ball.name != person){
-            var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs"; //need to reference ball ID
-            getData(mp3GET);
-        } 
+      if (ball.checkHit(event.mouse.position)) {
+        selectedBall = balls[i];
+        hitBall = true;
+        break;
+      } else {
+        hitBall = false;
+        console.log("false");
       }
-    } 
+    }
 
-    
+    if (hitBall === true) {
+      // pass in ID to the backend
+      console.log(selectedBall.id);
+      getData(selectedBall.id);
+    } else {
+      console.log("record audio");
+      //record audio
+      record.disabled = true;
+      record.style.backgroundColor = "blue";
+      stopRecord.disabled = false;
+      audioChunks = [];
+      rec.start();
 
-            ball.record(stream);
-            newBall = new Ball(
-                Date.now(),
-                person,
-                event.mouse.position.x,
-                event.mouse.position.y,
-                60,
-                "placeholder"
-              );
-              balls.push(newBall);
+      //send data
+      rec.ondataavailable = (e) => {
+        audioChunks.push(e.data);
+
+        if (rec.state == "inactive") {
+          blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
+          recordedAudio.src = URL.createObjectURL(blob);
+          recordedAudio.controls = true;
+          recordedAudio.autoplay = true;
+          sendData(blob);
         }
-    
+      };
+
+      newBall = new Ball(
+        Date.now(),
+        person,
+        event.mouse.position.x,
+        event.mouse.position.y,
+        60,
+        "placeholder"
+      );
+      balls.push(newBall);
+    }
   });
 }
 
