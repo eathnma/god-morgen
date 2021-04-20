@@ -6,14 +6,6 @@ function closeOverlay() {
   overlay.remove();
 }
 
-var blue = "rgb(88, 168, 253)";
-var green = "rgb(32, 190, 114)";
-var indigo = "rgb(90, 96, 254)";
-var mustard = "rgb(248, 188, 72)";
-var orange = "rgb(248, 84, 48)";
-var plum = "rgb(143, 23, 97)";
-
-var colors = [blue, green, indigo, mustard, orange, plum];
 var names = [
   "Ashley",
   "Brendan",
@@ -40,6 +32,15 @@ var names = [
   "Yan",
   "Zoe",
 ];
+
+var blue = 'rgb(88, 168, 253)';
+var green = 'rgb(32, 190, 114)';
+var indigo = 'rgb(90, 96, 254)';
+var mustard = 'rgb(248, 188, 72)';
+var orange = 'rgb(248, 84, 48)';
+var plum = 'rgb(143, 23, 97)';
+
+var colors = [blue, green, indigo, mustard, orange, plum];
 
 var Engine = Matter.Engine,
   Render = Matter.Render,
@@ -179,16 +180,15 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size, colour) {
+  constructor(timeStamp, name, x, y, size) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
     this.y = y;
     this.size = size;
-    this.colour = colour;
     this.body = Bodies.circle(this.x, this.y, this.size, {
       render: {
-        fillStyle: this.colour,
+        fillStyle: colors[Math.floor(Math.random() * colors.length)],
         lineWidth: 1,
         text: {
           content: this.name,
@@ -230,8 +230,7 @@ window.onload = function () {
         names[Math.floor(Math.random() * names.length)],
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
-        60 + Math.random() * 150,
-        "black"
+        60 + Math.random() * 150
       )
     );
   }
@@ -339,7 +338,7 @@ function handlerFunction(stream) {
         }
       };
 
-        newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60, 'black')
+        newBall = new Ball(Date.now(), person, event.mouse.position.x, event.mouse.position.y, 60)
         balls.push(newBall);
     } else if(foundBall) {
           var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
