@@ -201,7 +201,7 @@ window.addEventListener("resize", function () {
 });
 
 class Ball {
-  constructor(timeStamp, name, x, y, size) {
+  constructor(timeStamp, name, x, y, size, id) {
     this.timeStamp = timeStamp;
     this.name = name;
     this.x = x;
@@ -217,7 +217,7 @@ class Ball {
         },
       },
     });
-//    this.id = id;
+    this.id = id;
 
     World.add(world, [this.body]);
   }
@@ -254,6 +254,31 @@ class Ball {
     Matter.Body.scale(this.body, deflateFactor, deflateFactor);
   }
 
+  record(stream){
+    rec = new MediaRecorder(stream);
+    let blob;
+    let urlMP3;
+      
+    //record audio
+    record.disabled = true;
+    record.style.backgroundColor = "blue";
+    stopRecord.disabled = false;
+    audioChunks = [];
+    rec.start();
+
+    //send data
+    rec.ondataavailable = (e) => {
+    audioChunks.push(e.data);
+
+        if (rec.state == "inactive") {
+          blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
+          recordedAudio.src = URL.createObjectURL(blob);
+          recordedAudio.controls = true;
+          recordedAudio.autoplay = true;
+          sendData(blob);
+        }
+    };
+  }
 
   body() {
     return this.body;
@@ -314,6 +339,8 @@ Matter.Events.on(mouseConstraint, "mousemove", function (event) {
       let ball = balls[i];
       if(ball.checkHit(event.mouse.position)){
           foundBall = ball;
+      } else {
+          foundBall = null;
       }
   }
 
@@ -344,8 +371,8 @@ function init() {
         names[Math.floor(Math.random() * names.length)],
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
-        60 + Math.random() * maxSize
-        // fileIDs[Math.floor(Math.random() * fileIDs.length)]
+        60 + Math.random() * maxSize,
+         fileIDs[Math.floor(Math.random() * fileIDs.length)]
       )
     );
   }
@@ -371,48 +398,34 @@ navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
 // converting a blob url and sending it to a file
 // https://stackoverflow.com/questions/60431835/how-to-convert-a-blob-url-to-a-audio-file-and-save-it-to-the-server
 function handlerFunction(stream) {
-  rec = new MediaRecorder(stream);
-  let blob;
-  let urlMP3;
+
 
   Events.on(mouseConstraint, "mousedown", function (event) {
-    mouseDownID = 1;
+    
+    for (var i = 0; i < balls.length; i++) {
+      let ball = balls[i];
+      if(ball.checkHit(event.mouse.position)){
+        if(ball.name != person){
+            var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs"; //need to reference ball ID
+            getData(mp3GET);
+        } 
+      }
+    } 
 
-      console.log("mousedown");
-    //If mouse is pressed and not over a ball, add a new ball and record audio
-    if (!foundBall) {
-      //record audio
-      record.disabled = true;
-      record.style.backgroundColor = "blue";
-      stopRecord.disabled = false;
-      audioChunks = [];
-      rec.start();
+    
 
-      //send data
-      rec.ondataavailable = (e) => {
-        audioChunks.push(e.data);
-
-        if (rec.state == "inactive") {
-          blob = new Blob(audioChunks, {type: "audio/mpeg-3"});
-          recordedAudio.src = URL.createObjectURL(blob);
-          recordedAudio.controls = true;
-          recordedAudio.autoplay = true;
-          sendData(blob);
+            ball.record(stream);
+            newBall = new Ball(
+                Date.now(),
+                person,
+                event.mouse.position.x,
+                event.mouse.position.y,
+                60,
+                "placeholder"
+              );
+              balls.push(newBall);
         }
-      };
-
-      newBall = new Ball(
-        Date.now(),
-        person,
-        event.mouse.position.x,
-        event.mouse.position.y,
-        60
-      );
-      balls.push(newBall);
-    } else if (foundBall) {
-      var mp3GET = "1Veex6iLEGRTXrNZM3IfLdcwCG63MsGGs";
-      getData(mp3GET);
-    }
+    
   });
 }
 
