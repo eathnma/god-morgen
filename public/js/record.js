@@ -123,13 +123,16 @@ var newBall;
 var foundBall;
 var mouseDownID = 0;
 var lastSize = 40; //size of most recently added ball
-const maxSize = 120;
+const maxSize = 300;
 const minSize = 60;
 var listeningID = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
 var balls = [];
 const maxTime = 15000;
+var hitBall;
+var selectedBall;
+
 
 var topWall = Bodies.rectangle(
   window.innerWidth / 2,
@@ -272,17 +275,18 @@ function changeOpacity(ball) {
 
 //Update message, ball size
 Events.on(engine, "beforeUpdate", function (event) {
+    console.log(selectedBall);
   balls.forEach(changeOpacity);
-
+console.log(lastSize);
   lastSize *= inflateFactor;
 
-  if (mouseDownID == 1 && lastSize < maxSize && !foundBall) {
+  if (mouseDown && lastSize < maxSize && selectedBall == null) {
     newBall.inflate();
     document.getElementById("message").innerHTML = "Recording...";
-  } else if (listeningID == 1) {
-    foundBall.deflate();
+  } else if (mouseDown && selectedBall) {
+    selectedBall.deflate();
     document.getElementById("message").innerHTML = "Listening...";
-  } else if (listeningID == 0) {
+  } else if (!mouseDown) {
     if (person != null)
       if (time > 18) {
         document.getElementById("message").innerHTML =
@@ -302,28 +306,28 @@ Events.on(engine, "beforeUpdate", function (event) {
 });
 
 //Check hover on balls
-Matter.Events.on(mouseConstraint, "mousemove", function (event) {
-  //  var bodies = Matter.Composite.allBodies(world);
-  //  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
-  //  foundBall = foundPhysics[0];
-  //
-  for (var i = 0; i < balls.length; i++) {
-    let ball = balls[i];
-    if (ball.checkHit(event.mouse.position)) {
-      foundBall = ball;
-    } else {
-      foundBall = null;
-    }
-  }
-
-  if (foundBall && mouseDownID == 1 && newBall != null) {
-    if (foundBall != newBall) {
-      listeningID = 1;
-    } else {
-      listeningID = 0;
-    }
-  }
-});
+//Matter.Events.on(mouseConstraint, "mousemove", function (event) {
+//  //  var bodies = Matter.Composite.allBodies(world);
+//  //  var foundPhysics = Matter.Query.point(bodies, event.mouse.position);
+//  //  foundBall = foundPhysics[0];
+//  //
+//  for (var i = 0; i < balls.length; i++) {
+//    let ball = balls[i];
+//    if (ball.checkHit(event.mouse.position)) {
+//      foundBall = ball;
+//    } else {
+//      foundBall = null;
+//    }
+//  }
+//
+//  if (foundBall && mouseDownID == 1 && newBall != null) {
+//    if (foundBall != newBall) {
+//      listeningID = 1;
+//    } else {
+//      listeningID = 0;
+//    }
+//  }
+//});
 
 // Front-End File //
 window.onload = init;
@@ -342,7 +346,7 @@ function init() {
         names[Math.floor(Math.random() * names.length)],
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
-        60 + Math.random() * maxSize,
+        60 + Math.random() * 100,
         fileIDs[Math.floor(Math.random() * fileIDs.length)]
       )
     );
@@ -368,14 +372,16 @@ navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
 
 // converting a blob url and sending it to a file
 // https://stackoverflow.com/questions/60431835/how-to-convert-a-blob-url-to-a-audio-file-and-save-it-to-the-server
+
+var mouseDown = false;
+
 function handlerFunction(stream) {
   rec = new MediaRecorder(stream);
   let blob;
   let urlMP3;
 
   Events.on(mouseConstraint, "mousedown", function (event) {
-    var hitBall;
-    var selectedBall;
+    mouseDown = true;
 
     for (var i = 0; i < balls.length; i++) {
       let ball = balls[i];
@@ -429,6 +435,9 @@ function handlerFunction(stream) {
 }
 
 Events.on(mouseConstraint, "mouseup", function (event) {
+    mouseDown = false;
+    selectedBall = null;
+    
   mouseDownID = 0;
   lastSize = 40;
 
