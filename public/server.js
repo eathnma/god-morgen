@@ -50,7 +50,7 @@ app.post("/sendBlob", (req, res) => {
 
 // grab a list of file ID's from the drive
 // mostly used for debugging
-// googl.handleFileGetList(googl.listFiles);
+googl.handleFileGetList(googl.listFiles);
 
 // grab mp3 from backend
 app.get("/grabMP3/:id", async (req, res) => {

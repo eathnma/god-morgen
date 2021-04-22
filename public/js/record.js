@@ -18,23 +18,16 @@ function closeOverlay() {
 }
 
 // Default users
-var names = [
-  "Carolyn",
-  "Ali",
-  "Audrey",
-  "Alex",
-  "Peter",
-  "Tracy",
-];
+var names = ["Carolyn", "Ali", "Audrey", "Alex", "Peter", "Tracy"];
 
 // Default audio messages
 var fileIDs = [
-  "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
-  "1J2FomX8_Rhm8Vf62YAHYQmuimg5X7qg0",
-  "1uK6pHfZPc89QpFLM8IernI0d2BaGFP7h",
-  "1qQ7w61IaSddSs_0m1BGntVGAmzadKAxu",
-  "1SeNcK0poXQEoM8i1umDBFcx_nyNCig8a",
-  "1p1aW6GNhz-DfwigcHvwFIVBvrmJtEdGt",
+  "1oFnynIU3bQ9wkdIjTbdpXVBhFmzEW2qW", // Carolyn
+  "1sawoWd9ypTtH7HGLTjp4JTURT_ddf1H9", // Ali
+  "1DB6lgHltXSZaUqGUhu639JeA9H9JcVqy", // Audrey
+  "11oDUckljInsyh8AqN1QcKroNtWc-w0q8", // Alex
+  "1f6pdPAWRTMflt_63osIA-3HGdazZPMSa", // Peter
+  "1xxuN_vFcV55Qo_T_InE91bUqhZy541lE", // Tracy
 ];
 
 // Ball colours
@@ -48,34 +41,33 @@ var colors = [blue, green, indigo, mustard, orange, plum];
 
 // Matter.js
 var Engine = Matter.Engine,
-    Render = Matter.Render,
-    Runner = Matter.Runner,
-    MouseConstraint = Matter.MouseConstraint,
-    Mouse = Matter.Mouse,
-    Events = Matter.Events,
-    Common = Matter.Common,
-    Composite = Matter.Composite,
-    Composites = Matter.Composites,
-    World = Matter.World,
-    Bodies = Matter.Bodies;
-
+  Render = Matter.Render,
+  Runner = Matter.Runner,
+  MouseConstraint = Matter.MouseConstraint,
+  Mouse = Matter.Mouse,
+  Events = Matter.Events,
+  Common = Matter.Common,
+  Composite = Matter.Composite,
+  Composites = Matter.Composites,
+  World = Matter.World,
+  Bodies = Matter.Bodies;
 
 // Create engine
 var engine = Engine.create(),
-    world = engine.world;
+  world = engine.world;
 
 Engine.run(engine);
 
 // Create renderer
 var render = Render.create({
-    element: document.body,
-    engine: engine,
-    options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false,
-        background: "#fcfcfc",
-    },
+  element: document.body,
+  engine: engine,
+  options: {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    wireframes: false,
+    background: "#fcfcfc",
+  },
 });
 
 Render.run(render);
@@ -87,15 +79,15 @@ Runner.run(runner, engine);
 
 // Create mouse Constraint
 var mouse = Mouse.create(render.canvas),
-    mouseConstraint = MouseConstraint.create(engine, {
+  mouseConstraint = MouseConstraint.create(engine, {
     mouse: mouse,
     constraint: {
-        stiffness: 0.2,
-        render: {
+      stiffness: 0.2,
+      render: {
         visible: false,
-        },
+      },
     },
-});
+  });
 
 World.add(world, mouseConstraint);
 
@@ -103,16 +95,16 @@ World.add(world, mouseConstraint);
 render.mouse = mouse;
 
 const maxSize = 300,
-      minSize = 60,
-      maxTime = 30000;
+  minSize = 60,
+  maxTime = 30000;
 
 var newBall,
-    hitBall,
-    selectedBall,
-    balls = [],
-    lastSize = 60,
-    inflateFactor = 1.01,
-    deflateFactor = 0.999;
+  hitBall,
+  selectedBall,
+  balls = [],
+  lastSize = 60,
+  inflateFactor = 1.01,
+  deflateFactor = 0.999;
 
 var mouseDown = false;
 
@@ -213,10 +205,34 @@ function handlerFunction(stream) {
 }
 
 // Create walls
-var topWall = Bodies.rectangle(window.innerWidth / 2, -25, window.innerWidth, 50, { isStatic: true, render: { fillStyle: "white", }, }),
-    leftWall = Bodies.rectangle(-25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true, render: { fillStyle: "white",},}),
-    rightWall = Bodies.rectangle(window.innerWidth + 25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true, render: { fillStyle:"white",},}),
-    bottomWall = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 25, window.innerWidth, 50, { isStatic: true, render: { fillStyle: "white",},});
+var topWall = Bodies.rectangle(
+    window.innerWidth / 2,
+    -25,
+    window.innerWidth,
+    50,
+    {isStatic: true, render: {fillStyle: "white"}}
+  ),
+  leftWall = Bodies.rectangle(
+    -25,
+    window.innerHeight / 2,
+    50,
+    window.innerHeight,
+    {isStatic: true, render: {fillStyle: "white"}}
+  ),
+  rightWall = Bodies.rectangle(
+    window.innerWidth + 25,
+    window.innerHeight / 2,
+    50,
+    window.innerHeight,
+    {isStatic: true, render: {fillStyle: "white"}}
+  ),
+  bottomWall = Bodies.rectangle(
+    window.innerWidth / 2,
+    window.innerHeight + 25,
+    window.innerWidth,
+    50,
+    {isStatic: true, render: {fillStyle: "white"}}
+  );
 
 World.add(world, [topWall, leftWall, rightWall, bottomWall]);
 
@@ -226,8 +242,14 @@ window.addEventListener("resize", function () {
   render.height = window.innerHeight;
   Matter.Body.setPosition(topWall, {x: window.innerWidth / 2, y: -25});
   Matter.Body.setPosition(leftWall, {x: -25, y: window.innerHeight / 2});
-  Matter.Body.setPosition(rightWall, {x: window.innerWidth + 25, y: window.innerHeight / 2});
-  Matter.Body.setPosition(bottomWall, {x: window.innerWidth / 2, y: window.innerHeight + 25});
+  Matter.Body.setPosition(rightWall, {
+    x: window.innerWidth + 25,
+    y: window.innerHeight / 2,
+  });
+  Matter.Body.setPosition(bottomWall, {
+    x: window.innerWidth / 2,
+    y: window.innerHeight + 25,
+  });
 });
 
 class Ball {
@@ -288,63 +310,62 @@ function changeOpacity(ball) {
   let timeDiff = Date.now() - originalTime;
   let opacity = (1 / maxTime) * timeDiff;
   ball.setOpacity(1 - opacity);
-    
+
   //delete ball after it expires
   if (1 - opacity < 0) {
     ball.remove();
   }
 }
 
-
 Events.on(engine, "beforeUpdate", function (event) {
-    //update opacity of balls based on remaining time
-    balls.forEach(changeOpacity);
-    
-    //grow ball if mousepressed
-    lastSize *= inflateFactor;
+  //update opacity of balls based on remaining time
+  balls.forEach(changeOpacity);
 
-    if (mouseDown && lastSize < maxSize && selectedBall == null) {
-        //record
-        newBall.inflate();
-        message.innerHTML = "Recording...";
-    } else if (mouseDown && selectedBall) {
-        //listen
-        selectedBall.deflate();
-        document.getElementById("message").innerHTML = "Listening...";
-    } else if (!mouseDown && person != null) {
-        //default
-        if (time > 18) {
-            message.innerHTML = "Good evening, " + person;
-        } else if (time > 12) {
-            message.innerHTML = "Good afternoon, " + person;
-        } else if (time > 5) {
-            message.innerHTML = "Good morning, " + person;
-        } else if (time >= 0) {
-            message.innerHTML = "Good night, " + person;
-        } else {
-            message.innerHTML = "Hello, " + person;
-        }
+  //grow ball if mousepressed
+  lastSize *= inflateFactor;
+
+  if (mouseDown && lastSize < maxSize && selectedBall == null) {
+    //record
+    newBall.inflate();
+    message.innerHTML = "Recording...";
+  } else if (mouseDown && selectedBall) {
+    //listen
+    selectedBall.deflate();
+    document.getElementById("message").innerHTML = "Listening...";
+  } else if (!mouseDown && person != null) {
+    //default
+    if (time > 18) {
+      message.innerHTML = "Good evening, " + person;
+    } else if (time > 12) {
+      message.innerHTML = "Good afternoon, " + person;
+    } else if (time > 5) {
+      message.innerHTML = "Good morning, " + person;
+    } else if (time >= 0) {
+      message.innerHTML = "Good night, " + person;
+    } else {
+      message.innerHTML = "Hello, " + person;
     }
+  }
 });
 
 Events.on(mouseConstraint, "mouseup", function (event) {
-    //update state of mouse
-    mouseDown = false;
-    
-    //reset initial size of new balls
-    lastSize = 60;
+  //update state of mouse
+  mouseDown = false;
 
-    //delete ball after listening
-    if (selectedBall != null) {
-        selectedBall.remove();
-        selectedBall = null;
-    }
-    
-    //stop recording
-    record.disabled = false;
-    stop.disabled = true;
-    record.style.backgroundColor = "red";
-    if (rec.state != "inactive") rec.stop();
+  //reset initial size of new balls
+  lastSize = 60;
+
+  //delete ball after listening
+  if (selectedBall != null) {
+    selectedBall.remove();
+    selectedBall = null;
+  }
+
+  //stop recording
+  record.disabled = false;
+  stop.disabled = true;
+  record.style.backgroundColor = "red";
+  if (rec.state != "inactive") rec.stop();
 });
 
 function sendData(data) {
