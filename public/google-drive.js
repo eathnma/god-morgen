@@ -53,13 +53,11 @@ function getAccessToken(oAuth2Client, callback) {
   });
 }
 
-//to call from the server
+// class googl to use elsewhere
 export class Googl {
-  constructor() {
-    // Load client secrets from a local file.
-  }
+  constructor() {}
 
-  // handling files
+  // handle files with fileID as a parameter
   async handleFileGet(name) {
     var that = this;
     var handleByte;
@@ -68,17 +66,15 @@ export class Googl {
       .then((content) => {
         //Authorize a client with credentials, then call the Google Drive API.
         handleByte = that.authorizeGet(JSON.parse(content), name);
-        // console.log(handleByte);
         return handleByte;
       })
       .catch((err) => {
         if (err) return console.log("Error loading client secret file:", err);
       });
-
-    // console.log(getFrontend);
     return getFrontend;
   }
 
+  // authorize the handleFileGet method. This authorize function only takes two parameters
   async authorizeGet(credentials, name) {
     var responseLayer;
     var test;
@@ -108,6 +104,7 @@ export class Googl {
     return responseLayer;
   }
 
+  // handler method for getting the list of files
   handleFileGetList(method) {
     var that = this;
     fs.readFile("credentials.json", (err, content) => {
@@ -124,10 +121,8 @@ export class Googl {
       //Authorize a client with credentials, then call the Google Drive API.
       that.authorize(JSON.parse(content), method, name, blob);
     });
-    // return handleByte;
   }
 
-  // authorize ;.;
   authorize(credentials, callback, name, blob) {
     var bytes;
     const {client_secret, client_id, redirect_uris} = credentials.installed;
@@ -146,37 +141,27 @@ export class Googl {
     });
   }
 
+  // List all files within the google drive
+  // API gives four parameters
+  // kind, id, name, mimeType
   listFiles(auth, useless1, useless2) {
     const drive = google.drive({version: "v3", auth});
 
     function getList(drive, pageToken) {
-      drive.files.list(
-        {
-          // corpora: "user",
-          // pageSize: 10,
-          // q: "name='hello'",
-          // pageToken: pageToken ? pageToken : "",
-          // fields: "nextPageToken, files(*)",
-        },
-        (err, res) => {
-          if (err) return console.log("The API returned an error: " + err);
-          const files = res.data.files;
-          if (files.length) {
-            console.log("Files:");
-            // processList(files);
-            console.log(files);
-            if (res.data.nextPageToken) {
-              getList(drive, res.data.nextPageToken);
-            }
-
-            // files.map((file) => {
-            //     console.log(`${file.name} (${file.id})`);
-            // });
-          } else {
-            console.log("No files found.");
+      drive.files.list({}, (err, res) => {
+        if (err) return console.log("The API returned an error: " + err);
+        const files = res.data.files;
+        if (files.length) {
+          console.log("Files:");
+          // processList(files);
+          console.log(files);
+          if (res.data.nextPageToken) {
+            getList(drive, res.data.nextPageToken);
           }
+        } else {
+          console.log("No files found.");
         }
-      );
+      });
     }
 
     getList(drive, "");
@@ -187,8 +172,6 @@ export class Googl {
     var fileMetadata = {
       name: `${name}.mp3`,
     };
-    // var buf = Buffer.from(blob, 'base64');
-    // console.log("AEEE" + typeof(blob);
     var filepath = "file.mp3";
 
     try {
@@ -219,6 +202,8 @@ export class Googl {
     );
   }
 
+  // async method waits for the api to give a response
+  // grabs file ID to the response type "arraybuffer", data is sent through authorize & handleFileGet
   async getFile(auth, fileId) {
     var data;
     const drive = google.drive({version: "v3", auth});
@@ -232,15 +217,14 @@ export class Googl {
       }
     );
 
+    // Promise for JS ES6
     var a = grab
       .then((res) => {
-        // grabbing arraybuffer mp3?
+        // map res.data to var data & return it to authorize
         data = res.data;
-        // console.log(data);
         return data;
       })
       .catch((err) => {
-        // print out error statement
         console.log(err);
       });
     return a;

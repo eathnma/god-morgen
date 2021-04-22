@@ -133,7 +133,6 @@ const maxTime = 15000;
 var hitBall;
 var selectedBall;
 
-
 var topWall = Bodies.rectangle(
   window.innerWidth / 2,
   -25,
@@ -275,9 +274,9 @@ function changeOpacity(ball) {
 
 //Update message, ball size
 Events.on(engine, "beforeUpdate", function (event) {
-    console.log(selectedBall);
+  console.log(selectedBall);
   balls.forEach(changeOpacity);
-console.log(lastSize);
+  console.log(lastSize);
   lastSize *= inflateFactor;
 
   if (mouseDown && lastSize < maxSize && selectedBall == null) {
@@ -317,7 +316,6 @@ function init() {
   for (var i = 0; i < 6; i++) {
     balls.push(
       new Ball(
-        // Date.now() + Math.random() * 20000,
         Date.now(),
         names[Math.floor(Math.random() * names.length)],
         Math.random() * window.innerWidth,
@@ -345,9 +343,6 @@ function init() {
 navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
   handlerFunction(stream);
 });
-
-// converting a blob url and sending it to a file
-// https://stackoverflow.com/questions/60431835/how-to-convert-a-blob-url-to-a-audio-file-and-save-it-to-the-server
 
 var mouseDown = false;
 
@@ -411,7 +406,7 @@ function handlerFunction(stream) {
 }
 
 Events.on(mouseConstraint, "mouseup", function (event) {
-    mouseDown = false;
+  mouseDown = false;
   mouseDownID = 0;
   lastSize = 40;
 
