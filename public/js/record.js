@@ -12,46 +12,21 @@ document.getElementById("date").innerHTML = d.toLocaleDateString();
 document.getElementById("time").innerHTML = d.toLocaleTimeString();
 
 var names = [
-  "Ashley",
-  "Brendan",
-  "Carman",
-  "Darya",
-  "Ethan",
-  "Frank",
-  "Giorgia",
-  "Hason",
-  "Ian",
-  "Justin",
-  "Kelly",
-  "Lucy",
-  "Melanie",
-  "Norman",
-  "Ola",
-  "Peggy",
-  "Quinn",
-  "Rodney",
-  "Samantha",
-  "Tiffany",
-  "Vincent",
-  "Winnie",
-  "Yan",
-  "Zoe",
+  "Carolyn",
+  "Ali",
+  "Audrey",
+  "Alex",
+  "Peter",
+  "Tracy",
 ];
 
-// FILE ID's from the Google Drive
 var fileIDs = [
-  "19160KI4m4b778gBssHsrPkJK36K1ZhHx",
+  "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
+  "1J2FomX8_Rhm8Vf62YAHYQmuimg5X7qg0",
   "1uK6pHfZPc89QpFLM8IernI0d2BaGFP7h",
-  "13Wmlah6tygrjrTUU-109VTB6xi584q1o",
-  "1kiwvE5f2e0aoPwYPQyZU9FzdhFFS44DS",
   "1qQ7w61IaSddSs_0m1BGntVGAmzadKAxu",
-  "1hQD3-Yjo7r55Nh9TN874j1JF6tJ06-99",
   "1SeNcK0poXQEoM8i1umDBFcx_nyNCig8a",
   "1p1aW6GNhz-DfwigcHvwFIVBvrmJtEdGt",
-  "1N_M3t-pyo3cRT8BlJ2RCMUINKrDFz2nN",
-  "1J2FomX8_Rhm8Vf62YAHYQmuimg5X7qg0",
-  "1jVRrDyDuqLs-1Ey1aCHwPikOkDnx_ikb",
-  "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
 ];
 
 var blue = "rgb(88, 168, 253)";
@@ -129,7 +104,7 @@ var listeningID = 0;
 var inflateFactor = 1.01;
 var deflateFactor = 0.999;
 var balls = [];
-const maxTime = 15000;
+const maxTime = 30000;
 var hitBall;
 var selectedBall;
 
@@ -319,11 +294,11 @@ function init() {
       new Ball(
         // Date.now() + Math.random() * 20000,
         Date.now(),
-        names[Math.floor(Math.random() * names.length)],
+        names[i],
         Math.random() * window.innerWidth,
         Math.random() * window.innerHeight,
         60 + Math.random() * 100,
-        fileIDs[Math.floor(Math.random() * fileIDs.length)]
+        fileIDs[i]
       )
     );
   }
