@@ -1,4 +1,15 @@
+// Header
+var d = new Date();
+var time = d.getHours();
+document.getElementById("date").innerHTML = d.toLocaleDateString();
+document.getElementById("time").innerHTML = d.toLocaleTimeString();
+
+const message = document.getElementById("message");
+
+// Name of user
 var person;
+
+// Onboarding
 var overlay = document.getElementById("onboarding");
 
 function closeOverlay() {
@@ -6,11 +17,7 @@ function closeOverlay() {
   overlay.remove();
 }
 
-var d = new Date();
-var time = d.getHours();
-document.getElementById("date").innerHTML = d.toLocaleDateString();
-document.getElementById("time").innerHTML = d.toLocaleTimeString();
-
+// Default users
 var names = [
   "Carolyn",
   "Ali",
@@ -20,6 +27,7 @@ var names = [
   "Tracy",
 ];
 
+// Default audio messages
 var fileIDs = [
   "1sIPsFdjlTTaa3ns3mPfYt7vmVjmeGNWZ",
   "1J2FomX8_Rhm8Vf62YAHYQmuimg5X7qg0",
@@ -29,258 +37,85 @@ var fileIDs = [
   "1p1aW6GNhz-DfwigcHvwFIVBvrmJtEdGt",
 ];
 
+// Ball colours
 var blue = "rgb(88, 168, 253)";
 var green = "rgb(32, 190, 114)";
 var indigo = "rgb(90, 96, 254)";
 var mustard = "rgb(248, 188, 72)";
 var orange = "rgb(248, 84, 48)";
 var plum = "rgb(143, 23, 97)";
-
 var colors = [blue, green, indigo, mustard, orange, plum];
 
-var bodies = [];
-
+// Matter.js
 var Engine = Matter.Engine,
-  Render = Matter.Render,
-  Runner = Matter.Runner,
-  Common = Matter.Common,
-  Composite = Matter.Composite,
-  Composites = Matter.Composites,
-  MouseConstraint = Matter.MouseConstraint,
-  Mouse = Matter.Mouse,
-  Events = Matter.Events,
-  World = Matter.World,
-  Bodies = Matter.Bodies;
+    Render = Matter.Render,
+    Runner = Matter.Runner,
+    MouseConstraint = Matter.MouseConstraint,
+    Mouse = Matter.Mouse,
+    Events = Matter.Events,
+    Common = Matter.Common,
+    Composite = Matter.Composite,
+    Composites = Matter.Composites,
+    World = Matter.World,
+    Bodies = Matter.Bodies;
 
-//Engine (physics)
+
+// Create engine
 var engine = Engine.create(),
-  world = engine.world;
+    world = engine.world;
 
 Engine.run(engine);
 
-//Renderer (graphics)
+// Create renderer
 var render = Render.create({
-  element: document.body,
-  engine: engine,
-  options: {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    wireframes: false,
-    background: "#fcfcfc",
-  },
+    element: document.body,
+    engine: engine,
+    options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false,
+        background: "#fcfcfc",
+    },
 });
 
 Render.run(render);
 
-//Runner (animation)
+// Create runner
 var runner = Runner.create();
+
 Runner.run(runner, engine);
 
-//Mouse Constraint
+// Create mouse Constraint
 var mouse = Mouse.create(render.canvas),
-  mouseConstraint = MouseConstraint.create(engine, {
+    mouseConstraint = MouseConstraint.create(engine, {
     mouse: mouse,
     constraint: {
-      stiffness: 0.2,
-      render: {
+        stiffness: 0.2,
+        render: {
         visible: false,
-      },
+        },
     },
-  });
+});
 
 World.add(world, mouseConstraint);
 
 // keep the mouse in sync with rendering
 render.mouse = mouse;
 
-var allBodies = Matter.Composite.allBodies(world);
-var newBall;
-var foundBall;
-var mouseDownID = 0;
-var lastSize = 40; //size of most recently added ball
-const maxSize = 300;
-const minSize = 60;
-var listeningID = 0;
-var inflateFactor = 1.01;
-var deflateFactor = 0.999;
-var balls = [];
-const maxTime = 30000;
-var hitBall;
-var selectedBall;
+const maxSize = 300,
+      minSize = 60,
+      maxTime = 30000;
 
+var newBall,
+    hitBall,
+    selectedBall,
+    balls = [],
+    lastSize = 60,
+    inflateFactor = 1.01,
+    deflateFactor = 0.999;
 
-var topWall = Bodies.rectangle(
-  window.innerWidth / 2,
-  -25,
-  window.innerWidth,
-  50,
-  {
-    isStatic: true,
-    render: {
-      fillStyle: "white",
-    },
-  }
-);
+var mouseDown = false;
 
-var leftWall = Bodies.rectangle(
-  -25,
-  window.innerHeight / 2,
-  50,
-  window.innerHeight,
-  {
-    isStatic: true,
-    render: {
-      fillStyle: "white",
-    },
-  }
-);
-
-var rightWall = Bodies.rectangle(
-  window.innerWidth + 25,
-  window.innerHeight / 2,
-  50,
-  window.innerHeight,
-  {
-    isStatic: true,
-    render: {
-      fillStyle: "white",
-    },
-  }
-);
-
-var bottomWall = Bodies.rectangle(
-  window.innerWidth / 2,
-  window.innerHeight + 25,
-  window.innerWidth,
-  50,
-  {
-    isStatic: true,
-    render: {
-      fillStyle: "white",
-    },
-  }
-);
-
-//walls
-World.add(world, [topWall, leftWall, rightWall, bottomWall]);
-
-window.addEventListener("resize", function () {
-  render.width = window.innerWidth;
-  render.height = window.innerHeight;
-  Matter.Body.setPosition(topWall, {x: window.innerWidth / 2, y: -25});
-  Matter.Body.setPosition(leftWall, {x: -25, y: window.innerHeight / 2});
-  Matter.Body.setPosition(rightWall, {
-    x: window.innerWidth + 25,
-    y: window.innerHeight / 2,
-  });
-  Matter.Body.setPosition(bottomWall, {
-    x: window.innerWidth / 2,
-    y: window.innerHeight + 25,
-  });
-});
-
-class Ball {
-  constructor(timeStamp, name, x, y, size, id) {
-    this.timeStamp = timeStamp;
-    this.name = name;
-    this.x = x;
-    this.y = y;
-    this.size = size;
-    this.body = Bodies.circle(this.x, this.y, this.size, {
-      render: {
-        fillStyle: colors[Math.floor(Math.random() * colors.length)],
-        lineWidth: 1,
-        text: {
-          content: this.name,
-          size: 16,
-        },
-      },
-    });
-    this.id = id;
-
-    World.add(world, [this.body]);
-  }
-
-  checkHit(point) {
-    var bodies = Matter.Composite.allBodies(world);
-    var hitBodies = Matter.Query.point(bodies, point);
-    if (hitBodies[0] == this.body) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  setOpacity(val) {
-    this.body.render.opacity = val;
-  }
-
-  timeStamp() {
-    return this.timeStamp;
-  }
-
-  remove() {
-    Matter.Composite.remove(world, this.body);
-  }
-
-  inflate() {
-    Matter.Body.scale(this.body, inflateFactor, inflateFactor);
-  }
-
-  deflate() {
-    Matter.Body.scale(this.body, deflateFactor, deflateFactor);
-  }
-
-  record(stream) {}
-
-  body() {
-    return this.body;
-  }
-}
-
-function changeOpacity(ball) {
-  let originalTime = ball.timeStamp;
-  let timeDiff = Date.now() - originalTime;
-  let opacity = (1 / maxTime) * timeDiff;
-  ball.setOpacity(1 - opacity);
-  if (1 - opacity < 0 || 1 - opacity > 1) {
-    ball.remove();
-  }
-}
-
-//Update message, ball size
-Events.on(engine, "beforeUpdate", function (event) {
-    console.log(selectedBall);
-  balls.forEach(changeOpacity);
-console.log(lastSize);
-  lastSize *= inflateFactor;
-
-  if (mouseDown && lastSize < maxSize && selectedBall == null) {
-    newBall.inflate();
-    document.getElementById("message").innerHTML = "Recording...";
-  } else if (mouseDown && selectedBall) {
-    selectedBall.deflate();
-    document.getElementById("message").innerHTML = "Listening...";
-  } else if (!mouseDown) {
-    if (person != null)
-      if (time > 18) {
-        document.getElementById("message").innerHTML =
-          "Good evening, " + person;
-      } else if (time > 12) {
-        document.getElementById("message").innerHTML =
-          "Good afternoon, " + person;
-      } else if (time > 5) {
-        document.getElementById("message").innerHTML =
-          "Good morning, " + person;
-      } else if (time >= 0) {
-        document.getElementById("message").innerHTML = "Good night, " + person;
-      } else {
-        document.getElementById("message").innerHTML = "Hello, " + person;
-      }
-  }
-});
-
-// Front-End File //
 window.onload = init;
 var context; // Audio context
 var buf; // Audio buffer
@@ -321,17 +156,13 @@ navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
   handlerFunction(stream);
 });
 
-// converting a blob url and sending it to a file
-// https://stackoverflow.com/questions/60431835/how-to-convert-a-blob-url-to-a-audio-file-and-save-it-to-the-server
-
-var mouseDown = false;
-
 function handlerFunction(stream) {
   rec = new MediaRecorder(stream);
   let blob;
   let urlMP3;
 
   Events.on(mouseConstraint, "mousedown", function (event) {
+    //update state of mouse
     mouseDown = true;
 
     for (var i = 0; i < balls.length; i++) {
@@ -342,16 +173,13 @@ function handlerFunction(stream) {
         break;
       } else {
         hitBall = false;
-        console.log("false");
       }
     }
 
     if (hitBall === true) {
       // pass in ID to the backend
-      console.log(selectedBall.id);
       getData(selectedBall.id);
     } else {
-      console.log("record audio");
       //record audio
       record.disabled = true;
       record.style.backgroundColor = "blue";
@@ -385,22 +213,139 @@ function handlerFunction(stream) {
   });
 }
 
-Events.on(mouseConstraint, "mouseup", function (event) {
-    mouseDown = false;
-  mouseDownID = 0;
-  lastSize = 40;
+// Create walls
+var topWall = Bodies.rectangle(window.innerWidth / 2, -25, window.innerWidth, 50, { isStatic: true, render: { fillStyle: "white", }, }),
+    leftWall = Bodies.rectangle(-25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true, render: { fillStyle: "white",},}),
+    rightWall = Bodies.rectangle(window.innerWidth + 25, window.innerHeight / 2, 50, window.innerHeight, { isStatic: true, render: { fillStyle:"white",},}),
+    bottomWall = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 25, window.innerWidth, 50, { isStatic: true, render: { fillStyle: "white",},});
 
-  if (selectedBall != null) {
-    selectedBall.remove();
-    console.log("mouseUP");
+World.add(world, [topWall, leftWall, rightWall, bottomWall]);
+
+// Resize canvas
+window.addEventListener("resize", function () {
+  render.width = window.innerWidth;
+  render.height = window.innerHeight;
+  Matter.Body.setPosition(topWall, {x: window.innerWidth / 2, y: -25});
+  Matter.Body.setPosition(leftWall, {x: -25, y: window.innerHeight / 2});
+  Matter.Body.setPosition(rightWall, {x: window.innerWidth + 25, y: window.innerHeight / 2});
+  Matter.Body.setPosition(bottomWall, {x: window.innerWidth / 2, y: window.innerHeight + 25});
+});
+
+class Ball {
+  constructor(timeStamp, name, x, y, size, id) {
+    this.timeStamp = timeStamp;
+    this.name = name;
+    this.x = x;
+    this.y = y;
+    this.size = size;
+    this.body = Bodies.circle(this.x, this.y, this.size, {
+      render: {
+        fillStyle: colors[Math.floor(Math.random() * colors.length)],
+        lineWidth: 1,
+        text: {
+          content: this.name,
+          size: 16,
+        },
+      },
+    });
+    this.id = id;
+    World.add(world, [this.body]);
   }
-  //stop recording
-  record.disabled = false;
-  stop.disabled = true;
-  record.style.backgroundColor = "red";
 
-  // recording
-  if (rec.state != "inactive") rec.stop();
+  checkHit(point) {
+    var bodies = Matter.Composite.allBodies(world);
+    var hitBodies = Matter.Query.point(bodies, point);
+    if (hitBodies[0] == this.body) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  setOpacity(val) {
+    this.body.render.opacity = val;
+  }
+
+  timeStamp() {
+    return this.timeStamp;
+  }
+
+  inflate() {
+    Matter.Body.scale(this.body, inflateFactor, inflateFactor);
+  }
+
+  deflate() {
+    Matter.Body.scale(this.body, deflateFactor, deflateFactor);
+  }
+
+  remove() {
+    Matter.Composite.remove(world, this.body);
+  }
+}
+
+function changeOpacity(ball) {
+  //map remaining time of ball to opacity
+  let originalTime = ball.timeStamp;
+  let timeDiff = Date.now() - originalTime;
+  let opacity = (1 / maxTime) * timeDiff;
+  ball.setOpacity(1 - opacity);
+    
+  //delete ball after it expires
+  if (1 - opacity < 0) {
+    ball.remove();
+  }
+}
+
+
+Events.on(engine, "beforeUpdate", function (event) {
+    //update opacity of balls based on remaining time
+    balls.forEach(changeOpacity);
+    
+    //grow ball if mousepressed
+    lastSize *= inflateFactor;
+
+    if (mouseDown && lastSize < maxSize && selectedBall == null) {
+        //record
+        newBall.inflate();
+        message.innerHTML = "Recording...";
+    } else if (mouseDown && selectedBall) {
+        //listen
+        selectedBall.deflate();
+        document.getElementById("message").innerHTML = "Listening...";
+    } else if (!mouseDown && person != null) {
+        //default
+        if (time > 18) {
+            message.innerHTML = "Good evening, " + person;
+        } else if (time > 12) {
+            message.innerHTML = "Good afternoon, " + person;
+        } else if (time > 5) {
+            message.innerHTML = "Good morning, " + person;
+        } else if (time >= 0) {
+            message.innerHTML = "Good night, " + person;
+        } else {
+            message.innerHTML = "Hello, " + person;
+        }
+    }
+});
+
+Events.on(mouseConstraint, "mouseup", function (event) {
+    //update state of mouse
+    mouseDown = false;
+    
+    //reset initial size of new balls
+    lastSize = 60;
+
+    //delete ball after listening
+    if (selectedBall != null) {
+        selectedBall.remove();
+        selectedBall = null;
+    }
+    
+    //stop recording
+    record.disabled = false;
+    stop.disabled = true;
+    record.style.backgroundColor = "red";
+    if (rec.state != "inactive") rec.stop();
 });
 
 function sendData(data) {
